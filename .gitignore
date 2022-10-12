@@ -1,0 +1,5 @@
+/.env
+/.idea
+/containers/.volumes/*
+logs
+.DS_Store
