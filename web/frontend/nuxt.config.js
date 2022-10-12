@@ -1,7 +1,7 @@
 require('dotenv').config()
 const environment = process.env.APP_ENV || 'local'
 const appType = process.env.APP_TYPE || 'user'
-const envSet = require(`./nuxt_env/env.${appType}.js`)
+const envSet = require(`./nuxt_env/env.${appType}_${environment}.js`)
 const buildConfSet = require(`./nuxt_env/rte.build_config.js`)
 
 export default {
@@ -32,7 +32,6 @@ export default {
 
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
-    '@nuxtjs/moment',
     // https://go.nuxtjs.dev/eslint
     // '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/stylelint

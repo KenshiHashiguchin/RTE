@@ -31,8 +31,6 @@ module.exports = {
   },
   css: [
     '@/assets/style/scss/app.scss',
-    '@/assets/style/css/perfect-scrollbar.css',
-    '@/assets/style/css/slick.css',
   ],
   plugins: [
     'plugins/axios',

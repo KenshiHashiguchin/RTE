@@ -21,14 +21,13 @@ export default function ({ $axios, $cookies, redirect, store, error }) {
     console.log(`ErrorCode ${code}`, err.message)
     if (err.response.status === 401) {
       // tokenが無効になっている場合、storeをログアウト状態にしてTOPにリダレクト
-      if (store.state.auth.isAuthenticated) {
-        store.dispatch('auth/logout')
-        return redirect('/login?token=invalid')
-      }
+      // if (store.state.auth.isAuthenticated) {
+      //   store.dispatch('auth/logout')
+      //   return redirect('/login?token=invalid')
+      // }
     }
     if (err.response.status === 500 || err.response.status === 503) {
       // 500 と 503エラーの場合 エラーベージを表示
-      store.dispatch('master/browser_back/reset')
       return error({
         statusCode: err.response.status,
         message: err.response.statusText,
