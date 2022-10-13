@@ -1,17 +1,37 @@
-- [ ] 手動でテストを実行したか（ローカルでの動作確認）
-- [ ] コードの追加もしくは修正に対応するテストケースが存在しているか
+<!--- Provide a general summary of your changes in the Title above -->
 
-## JIRA URL
+## Description
+<!--- Describe your changes in detail -->
 
-## 差分内容
+## Related Issue
+<!--- This project only accepts pull requests related to open issues -->
+<!--- If suggesting a new feature or change, please discuss it in an issue first -->
+<!--- If fixing a bug, there should be an issue describing it with steps to reproduce -->
+<!--- Please link to the issue here: -->
 
-## やらなかったこと
+## Motivation and Context
+<!--- Why is this change required? What problem does it solve? -->
+<!--- If it fixes an open issue, please link to the issue here. -->
 
-## テスト方法・観点
+## How Has This Been Tested?
+<!--- Please describe in detail how you tested your changes. -->
+<!--- Include details of your testing environment and the tests you ran to -->
+<!--- see how your change affects other areas of the code, etc. -->
 
-## 画面キャプチャ・操作動画
+## Screenshots (if appropriate):
 
-## 関連 URL
+<!--- Please describe in detail how you tested your changes. -->
+<!--- Include details of your testing environment, and the tests you ran to -->
+<!--- see how your change affects other areas of the code, etc. -->
 
-## その他(補足・疑問点など)
+## All submissions
 
+<!--- Please provide links to the design documents if they exist. -->
+
+<!--- Indicating the accurate specification of the documents would be great. -->
+
+## How to review
+
+<!--- Please describe in detail how to review your changes. -->
+
+<!--- Please use checkboxes and describe reviewing order. -->
