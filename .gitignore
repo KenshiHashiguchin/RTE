@@ -1,5 +1,7 @@
 /.env
 /.idea
 /containers/.volumes/*
+/containers/nginx/ssl/default.*
+tmp
 logs
 .DS_Store
