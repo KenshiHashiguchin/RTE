@@ -8,7 +8,7 @@ export default {
   env: {
     name: environment,
     userAppUrl: process.env.APP_USER_URL,
-    shopAppUrl: process.env.APP_CORP_URL,
+    shopAppUrl: process.env.APP_MERCHANT_URL,
   },
   srcDir: `client/${appType}`,
 

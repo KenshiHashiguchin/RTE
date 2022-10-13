@@ -1,6 +1,6 @@
 <template>
   <div>
-    hello world!（corp）
+    hello world!（merchant）
   </div>
 </template>
 

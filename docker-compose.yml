@@ -34,7 +34,7 @@ services:
     depends_on:
       - mysql
       - user-nuxt
-      - corp-nuxt
+      - merchant-nuxt
   ### MySQL ################################################
   mysql:
     container_name: rte-mysql
@@ -78,8 +78,8 @@ services:
       - ./web/frontend/:/var/www/rte/web:delegated
     networks:
       - backend
-  corp-nuxt:
-    container_name: rte-corp-nuxt
+  merchant-nuxt:
+    container_name: rte-merchant-nuxt
     build:
       context: .
       dockerfile: ./containers/nuxt/Dockerfile
@@ -88,14 +88,14 @@ services:
         - GID=${HOST_GID}
         - USERNAME=${HOST_NAME}
         - GROUPNAME=${HOST_GROUP}
-        - PORT=${CORP_NUXT_PORT}
+        - PORT=${MERCHANT_NUXT_PORT}
         - APP_NAME=${APP_NAME}
         - APP_ENV=${APP_ENV}
         - APP_DEBUG=${APP_DEBUG}
         - APP_URL=${APP_URL}
     tty: true
     ports:
-      - "${CORP_NUXT_PORT}:4000"
+      - "${MERCHANT_NUXT_PORT}:4000"
     volumes:
       - ./web/frontend/:/var/www/rte/web:delegated
     networks:

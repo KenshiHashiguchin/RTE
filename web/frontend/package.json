@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev-user": "cross-env NODE_ENV=\"local\" APP_TYPE=\"user\" nuxt --port=3000",
-    "dev-corp": "cross-env NODE_ENV=\"local\" APP_TYPE=\"corp\" nuxt --port=4000",
+    "dev-merchant": "cross-env NODE_ENV=\"local\" APP_TYPE=\"merchant\" nuxt --port=4000",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
