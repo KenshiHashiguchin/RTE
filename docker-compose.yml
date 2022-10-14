@@ -1,0 +1,102 @@
+version: '3'
+
+networks:
+  backend:
+    driver: ${NETWORKS_DRIVER}
+
+volumes:
+  mysql:
+    driver: ${VOLUMES_DRIVER}
+
+services:
+  ### NGINX Server #########################################
+  nginx:
+    container_name: rte-nginx
+    build:
+      context: .
+      dockerfile: ./containers/nginx/Dockerfile
+      args:
+        - UID=${HOST_UID}
+        - GID=${HOST_GID}
+        - USERNAME=${HOST_NAME}
+        - GROUPNAME=${HOST_GROUP}
+    volumes:
+      - ./web/backend/:/var/www/rte/web
+      - ./containers/nginx/logs/:/var/log/nginx
+      - ./containers/nginx/sites/:/etc/nginx/sites-available
+      - ./containers/nginx/ssl/:/etc/nginx/ssl
+
+    ports:
+      - "${NGINX_HOST_HTTP_PORT}:8080"
+      - "${NGINX_HOST_HTTPS_PORT}:8443"
+    networks:
+      - backend
+    depends_on:
+      - mysql
+      - user-nuxt
+      - merchant-nuxt
+  ### MySQL ################################################
+  mysql:
+    container_name: rte-mysql
+    build:
+      context: ./containers/mysql/
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=UTC
+    cap_add:
+      - SYS_NICE # 参考 https://sunday-morning.app/posts/2020-07-29-docker-mysql8-mbind-operation-not-permitted
+    volumes:
+      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
+    ports:
+      - "${MYSQL_PORT}:3306"
+    networks:
+      - backend
+
+  ### Nodejs(Nuxt) ################################################
+  user-nuxt:
+    container_name: rte-user-nuxt
+    build:
+      context: .
+      dockerfile: ./containers/nuxt/Dockerfile
+      args:
+        - UID=${HOST_UID}
+        - GID=${HOST_GID}
+        - USERNAME=${HOST_NAME}
+        - GROUPNAME=${HOST_GROUP}
+        - PORT=${USER_NUXT_PORT}
+        - APP_NAME=${APP_NAME}
+        - APP_ENV=${APP_ENV}
+        - APP_DEBUG=${APP_DEBUG}
+        - APP_URL=${APP_URL}
+    tty: true
+    ports:
+      - "${USER_NUXT_PORT}:3000"
+    volumes:
+      - ./web/frontend/:/var/www/rte/web:delegated
+    networks:
+      - backend
+  merchant-nuxt:
+    container_name: rte-merchant-nuxt
+    build:
+      context: .
+      dockerfile: ./containers/nuxt/Dockerfile
+      args:
+        - UID=${HOST_UID}
+        - GID=${HOST_GID}
+        - USERNAME=${HOST_NAME}
+        - GROUPNAME=${HOST_GROUP}
+        - PORT=${MERCHANT_NUXT_PORT}
+        - APP_NAME=${APP_NAME}
+        - APP_ENV=${APP_ENV}
+        - APP_DEBUG=${APP_DEBUG}
+        - APP_URL=${APP_URL}
+    tty: true
+    ports:
+      - "${MERCHANT_NUXT_PORT}:4000"
+    volumes:
+      - ./web/frontend/:/var/www/rte/web:delegated
+    networks:
+      - backend
