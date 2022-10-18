@@ -31,9 +31,15 @@ module.exports = {
   },
   css: [
     '@/assets/style/scss/app.scss',
+    '@/assets/style/theme.styl',
+    '@/assets/style/app.styl',
+    'font-awesome/css/font-awesome.css',
+    'roboto-fontface/css/roboto/roboto-fontface.css'
   ],
   plugins: [
+    'plugins/vuetify',
     'plugins/axios',
+    'plugins/vee-validate'
   ],
   router: {
     middleware: [

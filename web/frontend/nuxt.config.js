@@ -3,6 +3,7 @@ const environment = process.env.APP_ENV || 'local'
 const appType = process.env.APP_TYPE || 'user'
 const envSet = require(`./nuxt_env/env.${appType}_${environment}.js`)
 const buildConfSet = require(`./nuxt_env/rte.build_config.js`)
+const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 
 export default {
   env: {
@@ -51,6 +52,7 @@ export default {
       },
     ],
   ],
+  loading: {color: '#3adced'},
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
     extractCSS: true,
@@ -70,6 +72,13 @@ export default {
         preserveLineBreaks: false,
         collapseWhitespace: true,
       },
+    },
+    transpile: ['vuetify/lib'],
+    plugins: [new VuetifyLoaderPlugin()],
+    loaders: {
+      stylus: {
+        import: ["~/assets/style/variables.styl"]
+      }
     },
     // build.templates local設定
     // templates: [
