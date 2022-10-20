@@ -1,3 +1,4 @@
 web/frontend/node_modules
 web/frontend/.env
+web/api/.env
 .env
