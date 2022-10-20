@@ -100,3 +100,25 @@ services:
       - ./web/frontend/:/var/www/rte/web:delegated
     networks:
       - backend
+  ### API #########################################
+  golang:
+    tty: true
+    container_name: rte-golang
+    build:
+      context: .
+      dockerfile: ./containers/go/Dockerfile
+    volumes:
+      - ./web/api/:/go/src/github.com/RTE/web/api
+    networks:
+      - backend
+    depends_on:
+      - mysql
+      - redis
+  redis:
+    image: "redis:7.0.5-alpine3.16"
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - "./data/redis:/data"
+    networks:
+      - backend
