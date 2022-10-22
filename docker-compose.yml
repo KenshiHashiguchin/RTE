@@ -122,3 +122,17 @@ services:
       - "./data/redis:/data"
     networks:
       - backend
+  ruby:
+    tty: true
+    container_name: rte-ruby
+    build:
+      context: .
+      dockerfile: containers/ruby/Dockerfile
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - "./web/api/db:/db"
+    networks:
+      - backend
