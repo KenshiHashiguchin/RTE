@@ -1,25 +1,22 @@
-package handler
+package merchant
 
 import (
 	"github.com/RTE/web/api/infrastructure/dao/kvs"
+	"github.com/RTE/web/api/presentation/handler"
 	"github.com/RTE/web/api/presentation/request"
 	"github.com/RTE/web/api/usecase"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-type UserToken struct {
-	UseCase usecase.IGenerateUserToken
-}
-
-func newUserToken() *UserToken {
-	dao := kvs.NewUserToken()
-	return &UserToken{
+func newUserToken() *handler.UserToken {
+	dao := kvs.NewMerchantToken() //merchant
+	return &handler.UserToken{
 		UseCase: usecase.NewGenerateUserTokenUsecase(dao),
 	}
 }
 
-func HandleGetUserToken(c *gin.Context) {
+func HandleGetToken(c *gin.Context) {
 	addr := c.Param("address")
 	req := request.Token{addr}
 	ok, err := req.Validate()

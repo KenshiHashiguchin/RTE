@@ -16,15 +16,15 @@ type reserveHandler struct {
 	usecase usecase.IAuth
 }
 
-func newReserveHandler() *authHandler {
+func newReserveHandler() *AuthHandler {
 	dao := kvs.NewUserToken()
 	userRepo := repositoryImpl.NewUserRepository()
-	return &authHandler{
-		usecase: usecase.NewAuthUseCase(dao, userRepo),
+	return &AuthHandler{
+		Usecase: usecase.NewAuthUseCase(dao, userRepo),
 	}
 }
 
 func HandleReserve(c *gin.Context) {
-	// TOOD
+	// TODO
 	c.JSON(http.StatusOK, gin.H{})
 }

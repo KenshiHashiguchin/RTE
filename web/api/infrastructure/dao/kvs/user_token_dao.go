@@ -1,7 +1,6 @@
 package kvs
 
 import (
-	"context"
 	"time"
 )
 
@@ -19,8 +18,6 @@ func NewUserToken() IUserToken {
 
 const tokenKey = "token:"
 const tokenExpire = 86400
-
-var ct = context.Background()
 
 func (o token) SetToken(address string, value string) {
 	err := conn.Set(ctx, tokenKey+address, value, tokenExpire*time.Second).Err()
