@@ -38,14 +38,14 @@ sudo vi /etc/hosts
 ※rte-local.comがユーザドメイン <br>
 ※merchant.rte-local.comが事業者ドメインとなる
 
-### api起動
+## api起動
 ```bash
 docker exec -it rte-golang bash
 go run main/*
 ```
 起動確認はブラウザで http://localhost/api/token/0xF272453bf221D5e09374aDa6607Fc8d834E2d25b にアクセスできればOK
 
-### フロントエンド build&nuxt server起動  
+## フロントエンド build&nuxt server起動  
 ※nuxtはユーザ側、事業者側でそれぞれ起動する構成としているので以下必要に応じて実施  
 **ユーザ側起動する場合**
 ```
@@ -63,6 +63,23 @@ yarn dev-merchant
 ```
 起動確認はブラウザで https://merchant.rte-local.com にアクセスできればOK
 
+## DBスキーマ更新方法
+```shell
+ docker-compose exec ruby bundle exec ridgepole -a -c /db/config/database.yml -f /db/SchemaFile.rb -E default
+```
+
+
 ## tips
+### 証明書エラーが出る
+
+---
 ブラウザで証明書関連の警告が出た場合以下参照し、自PCに証明書を信頼させる
 https://www.curict.com/item/2a/2ace791.html
+
+### DBスキーマを更新する
+
+---
+```shell
+ docker-compose exec ruby bundle exec ridgepole -a -c /db/config/database.yml -f /db/SchemaFile.rb -E default
+```
+
