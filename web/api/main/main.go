@@ -8,6 +8,7 @@ import (
 func main() {
 	r := gin.Default()
 	logSetting(r)
+	session(r)
 	r.Use(middleware.ResponseError()) // error response
 
 	route(r)

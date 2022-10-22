@@ -24,7 +24,7 @@ func HandleGetUserToken(c *gin.Context) {
 	req := request.Token{addr}
 	ok, err := req.Validate()
 	if ok != true {
-		c.JSON(http.StatusUnprocessableEntity, err)
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err})
 		return
 	}
 	u := newUserToken().useCase.GenerateUserToken(addr)
