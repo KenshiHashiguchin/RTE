@@ -20,11 +20,11 @@
         </v-content>
         <!-- Go to top -->
         <app-fab></app-fab>
-        <!-- theme setting -->
-        <v-btn small fab dark falt fixed top="top" right="right" class="setting-fab" color="red"
-               @click="openThemeSettings">
-          <v-icon>settings</v-icon>
-        </v-btn>
+        <!--&lt;!&ndash; theme setting &ndash;&gt;-->
+        <!--<v-btn small fab dark falt fixed top="top" right="right" class="setting-fab" color="red"-->
+        <!--       @click="openThemeSettings">-->
+        <!--  <v-icon>settings</v-icon>-->
+        <!--</v-btn>-->
         <v-navigation-drawer
           class="setting-drawer"
           temporary
@@ -88,19 +88,21 @@
   }
 </script>
 
-<style lang="stylus" scoped>
-  .setting-fab
+<style lang="scss" scoped>
+  .setting-fab {
     top: 50% !important;
     right: 0;
     border-radius: 0
+  }
 
-  .page-wrapper
+  .page-wrapper {
     min-height: calc(100vh - 64px - 50px - 81px);
-    margin-bottom 50px;
+    margin-bottom: 50px;
+  }
 
-  .app--footer
-    position absolute;
-    bottom 0;
-    width 100%;
-
+  .app--footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
 </style>

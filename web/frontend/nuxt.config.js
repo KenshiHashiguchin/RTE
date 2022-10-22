@@ -37,6 +37,7 @@ export default {
     // '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/stylelint
     // '@nuxtjs/stylelint-module',
+    '@nuxtjs/vuetify',
   ],
   moment: {
     locales: ['ja'],
@@ -73,13 +74,13 @@ export default {
         collapseWhitespace: true,
       },
     },
-    transpile: ['vuetify/lib'],
-    plugins: [new VuetifyLoaderPlugin()],
-    loaders: {
-      stylus: {
-        import: ["~/assets/style/variables.styl"]
-      }
-    },
+    // transpile: ['vuetify/lib'],
+    // plugins: [new VuetifyLoaderPlugin()],
+    // loaders: {
+    //   stylus: {
+    //     import: ["~/assets/style/variables.styl"]
+    //   }
+    // },
     // build.templates local設定
     // templates: [
     //   {
