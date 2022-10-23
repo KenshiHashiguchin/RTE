@@ -31,6 +31,12 @@ func merchantRoute(api *gin.RouterGroup) {
 	{
 		merchant.GET("/token/:address", merchantHandler.HandleGetToken)
 		merchant.GET("/auth", merchantHandler.HandleAuth)
-		merchant.POST("register", merchantHandler.HandleRegister)
+
+		auth := merchant.Group("")
+		auth.Use(middleware.AuthMiddleware())
+		{
+			auth.POST("/register", merchantHandler.HandleRegister)
+			auth.GET("/reserve_list", merchantHandler.HandleReserveList)
+		}
 	}
 }

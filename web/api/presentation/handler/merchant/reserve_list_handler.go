@@ -1,15 +1,16 @@
-package handler
+package merchant
 
 import (
 	"github.com/RTE/web/api/infrastructure/dao"
 	"github.com/RTE/web/api/infrastructure/repositoryImpl"
+	"github.com/RTE/web/api/presentation/handler"
 	"github.com/RTE/web/api/usecase"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type reserveListHandler struct {
-	usecase usecase.IGetReservation
+	usecase usecase.IMerchantReservation
 }
 
 func newReserveListHandler() *reserveListHandler {
@@ -17,7 +18,7 @@ func newReserveListHandler() *reserveListHandler {
 	mDao := dao.NewMerchantDao()
 	repo := repositoryImpl.NewReserveRepository(rDao, mDao)
 	return &reserveListHandler{
-		usecase: usecase.NewGetReservationUseCase(repo),
+		usecase: usecase.NewMerchantReservationUseCase(repo),
 	}
 }
 
@@ -31,7 +32,7 @@ type resReserve struct {
 }
 
 func HandleReserveList(c *gin.Context) {
-	user, err := AuthUser(c)
+	user, err := handler.AuthUser(c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{})
 		return
