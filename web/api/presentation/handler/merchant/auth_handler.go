@@ -10,10 +10,6 @@ import (
 	"net/http"
 )
 
-type IAuthHandler interface {
-	HandleRegisterUser(c *gin.Context)
-}
-
 func newAuthHandler() *handler.AuthHandler {
 	dao := kvs.NewMerchantToken()
 	return &handler.AuthHandler{

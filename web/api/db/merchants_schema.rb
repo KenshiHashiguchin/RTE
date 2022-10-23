@@ -10,5 +10,5 @@ create_table "merchants", primary_key: "id", id: { comment: "merchant id" }, cha
   t.string "merchant_address", null: false, comment: "事業者住所"
   t.timestamp "create_ts", null: false, comment: "作成日時"
   t.timestamp "update_ts", null: false, comment: "更新日時"
-  t.timestamp "delete_ts", comment: "削除日時"
+  t.index [:address], unique: true, name: "address"
 end

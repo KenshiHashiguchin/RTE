@@ -8,10 +8,6 @@ import (
 	"net/http"
 )
 
-type IGetStoresHandler interface {
-	HandleGetStores(c *gin.Context)
-}
-
 type getStoresHandler struct {
 	usecase usecase.IGetMerchants
 }
