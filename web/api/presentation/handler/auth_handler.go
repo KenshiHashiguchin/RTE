@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/RTE/web/api/domain/model"
 	"github.com/RTE/web/api/infrastructure/dao/kvs"
-	"github.com/RTE/web/api/infrastructure/repositoryImpl"
 	"github.com/RTE/web/api/presentation/request"
 	"github.com/RTE/web/api/usecase"
 	"github.com/RTE/web/api/util"
@@ -23,9 +22,8 @@ type AuthHandler struct {
 
 func newAuthHandler() *AuthHandler {
 	dao := kvs.NewUserToken()
-	userRepo := repositoryImpl.NewUserRepository()
 	return &AuthHandler{
-		Usecase: usecase.NewAuthUseCase(dao, userRepo),
+		Usecase: usecase.NewAuthUseCase(dao),
 	}
 }
 

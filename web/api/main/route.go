@@ -12,6 +12,7 @@ func route(r *gin.Engine) {
 	{
 		api.GET("token/:address", handler.HandleGetUserToken)
 		api.GET("/auth", handler.HandleAuth) //TODO POST
+		api.GET("/merchants", handler.HandleGetStores)
 
 		auth := api.Group("")
 		auth.Use(middleware.AuthMiddleware())

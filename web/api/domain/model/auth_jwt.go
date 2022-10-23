@@ -21,6 +21,10 @@ func NewUserClaims(address string) UserClaims {
 	}
 }
 
+func (u UserClaims) GetAddress() string {
+	return u.address
+}
+
 func GetAuthUserByTokenString(tokenString, key string) (UserClaims, error) {
 	auth := &UserClaims{}
 	_, err := jwt.ParseWithClaims(tokenString, auth, func(token *jwt.Token) (interface{}, error) {

@@ -3,7 +3,6 @@ package usecase
 import (
 	"errors"
 	"github.com/RTE/web/api/domain/model"
-	"github.com/RTE/web/api/domain/repository"
 	"github.com/RTE/web/api/infrastructure/dao/kvs"
 	"github.com/RTE/web/api/util"
 	"github.com/dgrijalva/jwt-go"
@@ -14,14 +13,12 @@ type IAuth interface {
 }
 
 type auth struct {
-	userTokenDao   kvs.IUserToken
-	userRepository repository.User
+	userTokenDao kvs.IUserToken
 }
 
-func NewAuthUseCase(userTokenDao kvs.IUserToken, userRepository repository.User) IAuth {
+func NewAuthUseCase(userTokenDao kvs.IUserToken) IAuth {
 	return &auth{
-		userTokenDao:   userTokenDao,
-		userRepository: userRepository,
+		userTokenDao: userTokenDao,
 	}
 }
 

@@ -2,7 +2,6 @@ package merchant
 
 import (
 	"github.com/RTE/web/api/infrastructure/dao/kvs"
-	"github.com/RTE/web/api/infrastructure/repositoryImpl"
 	"github.com/RTE/web/api/presentation/handler"
 	"github.com/RTE/web/api/presentation/request"
 	"github.com/RTE/web/api/usecase"
@@ -17,9 +16,8 @@ type IAuthHandler interface {
 
 func newAuthHandler() *handler.AuthHandler {
 	dao := kvs.NewMerchantToken()
-	userRepo := repositoryImpl.NewUserRepository()
 	return &handler.AuthHandler{
-		Usecase: usecase.NewAuthUseCase(dao, userRepo),
+		Usecase: usecase.NewAuthUseCase(dao),
 	}
 }
 
