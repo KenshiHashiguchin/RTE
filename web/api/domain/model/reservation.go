@@ -15,8 +15,7 @@ type Reservation struct {
 	number          uint
 }
 
-func NewReservation(merchantId uint, reservedAddress, surname, firstname, tel string, number uint) Reservation {
-	paymentId, _ := generatePaymentId()
+func NewReservation(paymentId string, merchantId uint, reservedAddress, surname, firstname, tel string, number uint) Reservation {
 	return Reservation{
 		paymentId,
 		merchantId,
@@ -56,7 +55,7 @@ func (r Reservation) GetNumber() uint {
 	return r.number
 }
 
-func generatePaymentId() (string, error) {
+func GeneratePaymentId() (string, error) {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 	// 乱数を生成

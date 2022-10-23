@@ -6,16 +6,16 @@ import (
 )
 
 type IMerchantDao interface {
-	Save(merchant Merchants) error
-	Get(address string) *Merchants
-	GetById(id uint) (*Merchants, error)
-	GetAll() []Merchants
+	Save(merchant Merchant) error
+	Get(address string) *Merchant
+	GetById(id uint) (*Merchant, error)
+	GetAll() []Merchant
 }
 
 type merchantDao struct {
 }
 
-type Merchants struct {
+type Merchant struct {
 	Id              uint      `db:"id"`
 	Address         string    `db:"address"`
 	ReceivedAddress string    `db:"received_address"`
@@ -33,7 +33,7 @@ func NewMerchantDao() IMerchantDao {
 	return &merchantDao{}
 }
 
-func (o merchantDao) Save(merchant Merchants) error {
+func (o merchantDao) Save(merchant Merchant) error {
 	dbmap := initDb()
 	defer dbmap.Db.Close()
 	merchant.CreateTs = time.Now()
@@ -41,11 +41,11 @@ func (o merchantDao) Save(merchant Merchants) error {
 	return dbmap.Insert(&merchant)
 }
 
-func (o merchantDao) GetAll() []Merchants {
+func (o merchantDao) GetAll() []Merchant {
 	dbmap := initDb()
 	defer dbmap.Db.Close()
 
-	var merchants []Merchants
+	var merchants []Merchant
 	_, err := dbmap.Select(&merchants, "select * from merchants")
 	if err != nil {
 		log.Print(err)
@@ -54,11 +54,11 @@ func (o merchantDao) GetAll() []Merchants {
 	return merchants
 }
 
-func (o merchantDao) Get(address string) *Merchants {
+func (o merchantDao) Get(address string) *Merchant {
 	dbmap := initDb()
 	defer dbmap.Db.Close()
 
-	var merchant Merchants
+	var merchant Merchant
 	err := dbmap.SelectOne(&merchant, "select * from merchants where address = ?", address)
 	if err != nil {
 		log.Print(err)
@@ -67,11 +67,11 @@ func (o merchantDao) Get(address string) *Merchants {
 	return &merchant
 }
 
-func (o merchantDao) GetById(id uint) (*Merchants, error) {
+func (o merchantDao) GetById(id uint) (*Merchant, error) {
 	dbmap := initDb()
 	defer dbmap.Db.Close()
 
-	var merchant Merchants
+	var merchant Merchant
 	err := dbmap.SelectOne(&merchant, "select * from merchants where id = ?", id)
 	if err != nil {
 		log.Print(err)

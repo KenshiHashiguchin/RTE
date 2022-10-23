@@ -27,6 +27,7 @@ func HandleReserve(c *gin.Context) {
 	user, err := AuthUser(c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{})
+		return
 	}
 
 	num := util.ConvertStringToUint(c.PostForm("number"))

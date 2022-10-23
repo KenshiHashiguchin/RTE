@@ -18,6 +18,7 @@ func NewReserveUseCase(repo repository.ReserveRepository) IReserve {
 }
 
 func (t reserve) Reserve(merchantId uint, reservedAddress, surname, firstname, tel string, number uint) error {
-	reservation := model.NewReservation(merchantId, reservedAddress, surname, firstname, tel, number)
+	paymentId, _ := model.GeneratePaymentId()
+	reservation := model.NewReservation(paymentId, merchantId, reservedAddress, surname, firstname, tel, number)
 	return t.repo.Save(reservation)
 }

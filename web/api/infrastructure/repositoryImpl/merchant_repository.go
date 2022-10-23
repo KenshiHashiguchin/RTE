@@ -57,7 +57,7 @@ func (u merchantImpl) GetMerchants() []model.Merchant {
 }
 
 func (u merchantImpl) Register(address, receiveAddress, name, tel, merchantAddress string, deposit, cancelableTime uint) error {
-	merchant := dao.Merchants{
+	merchant := dao.Merchant{
 		Address:         address,
 		ReceivedAddress: receiveAddress,
 		Deposit:         deposit,

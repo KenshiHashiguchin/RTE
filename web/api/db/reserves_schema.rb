@@ -1,6 +1,6 @@
 # /db/Schemafile
 
-create_table "reserves", primary_key: "id", id: { comment: "reservation id" }, charset: "utf8", force: :cascade do |t|
+create_table "reserves", primary_key: "id", id: :string, comment: "支払いID", charset: "utf8", force: :cascade do |t|
   t.string "reserved_address", comment: "予約者アドレス"
   t.integer "merchant_id", comment: "事業者ID"
   t.string "surname", null: false, comment: "予約者姓"
