@@ -10,10 +10,11 @@ import (
 func route(r *gin.Engine) {
 	api := r.Group("api")
 	{
-		api.GET("token/:address", handler.HandleGetUserToken)
+		api.GET("/token/:address", handler.HandleGetUserToken)
 		api.GET("/auth", handler.HandleAuth) //TODO POST
 		api.GET("/merchants", handler.HandleGetStores)
 		api.GET("/merchant/:address", handler.HandleMerchant)
+		api.GET("/reserve_list", handler.HandleReserveList)
 
 		auth := api.Group("")
 		auth.Use(middleware.AuthMiddleware())
@@ -28,7 +29,7 @@ func route(r *gin.Engine) {
 func merchantRoute(api *gin.RouterGroup) {
 	merchant := api.Group("/merchant")
 	{
-		merchant.GET("token/:address", merchantHandler.HandleGetToken)
+		merchant.GET("/token/:address", merchantHandler.HandleGetToken)
 		merchant.GET("/auth", merchantHandler.HandleAuth)
 		merchant.POST("register", merchantHandler.HandleRegister)
 	}

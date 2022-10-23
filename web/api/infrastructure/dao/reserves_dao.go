@@ -1,18 +1,20 @@
 package dao
 
 import (
+	"log"
 	"time"
 )
 
 type IReserveDao interface {
 	Save(reserve Reserves) error
+	GetAllByAddress(address string) []Reserves
 }
 
 type reserveDao struct {
 }
 
 type Reserves struct {
-	Id              uint      `db:"id"`
+	Id              string    `db:"id"`
 	ReservedAddress string    `db:"reserved_address"`
 	MerchantId      uint      `db:"merchant_id"`
 	Surname         string    `db:"surname"`
@@ -33,4 +35,17 @@ func (o reserveDao) Save(reserve Reserves) error {
 	reserve.CreateTs = time.Now()
 	reserve.UpdateTs = time.Now()
 	return dbmap.Insert(&reserve)
+}
+
+func (o reserveDao) GetAllByAddress(address string) []Reserves {
+	dbmap := initDb()
+	defer dbmap.Db.Close()
+
+	var reserves []Reserves
+	_, err := dbmap.Select(&reserves, "select * from reserves where reserved_address = ?", address)
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
+	return reserves
 }
