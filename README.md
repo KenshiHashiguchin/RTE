@@ -41,6 +41,7 @@ sudo vi /etc/hosts
 ## api起動
 ```bash
 docker exec -it rte-golang bash
+go mod tidy
 go run main/*
 ```
 起動確認はブラウザで http://localhost/api/token/0xF272453bf221D5e09374aDa6607Fc8d834E2d25b にアクセスできればOK
@@ -51,6 +52,7 @@ go run main/*
 ```
 # nuxtコンテナに接続
 docker exec -it rte-user-nuxt ash
+yarn install
 yarn dev-user
 ```
 起動確認はブラウザで https://rte-local.com にアクセスできればOK
@@ -59,6 +61,7 @@ yarn dev-user
 ```
 # nuxtコンテナに接続
 docker exec -it rte-merchant-nuxt ash
+yarn install
 yarn dev-merchant
 ```
 起動確認はブラウザで https://merchant.rte-local.com にアクセスできればOK
