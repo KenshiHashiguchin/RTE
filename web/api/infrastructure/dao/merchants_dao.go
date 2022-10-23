@@ -1,13 +1,12 @@
 package dao
 
 import (
-	"database/sql"
 	"log"
 	"time"
 )
 
 type IMerchantDao interface {
-	Save()
+	Save(merchant Merchants) error
 	GetAll() []Merchants
 }
 
@@ -15,26 +14,29 @@ type merchantDao struct {
 }
 
 type Merchants struct {
-	Id              uint         `db:"id"`
-	Address         string       `db:"address"`
-	ReceivedAddress string       `db:"received_address"`
-	Deposit         uint         `db:"deposit"`
-	CancelableTime  uint         `db:"cancelable_time"`
-	Name            string       `db:"name"`
-	Phonenumber     string       `db:"phonenumber"`
-	MerchantAddress string       `db:"merchant_address"`
-	CreateTs        time.Time    `db:"create_ts"`
-	UpdateTs        time.Time    `db:"update_ts"`
-	DeleteTs        sql.NullTime `db:"delete_ts"`
+	Id              uint      `db:"id"`
+	Address         string    `db:"address"`
+	ReceivedAddress string    `db:"received_address"`
+	Deposit         uint      `db:"deposit"`
+	CancelableTime  uint      `db:"cancelable_time"`
+	Name            string    `db:"name"`
+	Phonenumber     string    `db:"phonenumber"`
+	MerchantAddress string    `db:"merchant_address"`
+	CreateTs        time.Time `db:"create_ts"`
+	UpdateTs        time.Time `db:"update_ts"`
+	//DeleteTs        sql.NullTime `db:"delete_ts"`
 }
 
 func NewMerchantDao() IMerchantDao {
 	return &merchantDao{}
 }
 
-func (o merchantDao) Save() {
+func (o merchantDao) Save(merchant Merchants) error {
 	dbmap := initDb()
 	defer dbmap.Db.Close()
+	merchant.CreateTs = time.Now()
+	merchant.UpdateTs = time.Now()
+	return dbmap.Insert(&merchant)
 }
 
 func (o merchantDao) GetAll() []Merchants {

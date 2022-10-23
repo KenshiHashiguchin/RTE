@@ -1,7 +1,8 @@
 package merchant
 
 import (
-	"github.com/RTE/web/api/infrastructure/dao/kvs"
+	"github.com/RTE/web/api/infrastructure/dao"
+	"github.com/RTE/web/api/infrastructure/repositoryImpl"
 	"github.com/RTE/web/api/presentation/handler"
 	"github.com/RTE/web/api/presentation/request"
 	"github.com/RTE/web/api/usecase"
@@ -15,19 +16,19 @@ type IRegisterHandler interface {
 }
 
 type registerHandler struct {
-	usecase usecase.IAuth
+	usecase usecase.IRegisterMerchant
 }
 
 func newRegisterHandler() *registerHandler {
-	dao := kvs.NewUserToken()
+	dao := dao.NewMerchantDao()
+	repo := repositoryImpl.NewMerchantRepository(dao)
 	return &registerHandler{
-		usecase: usecase.NewAuthUseCase(dao),
+		usecase: usecase.IRegisterMerchant(repo),
 	}
 }
 
 func HandleRegister(c *gin.Context) {
-	//user, err := handler.AuthUser(c)
-	_, err := handler.AuthUser(c)
+	user, err := handler.AuthUser(c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{})
 	}
@@ -48,7 +49,18 @@ func HandleRegister(c *gin.Context) {
 		return
 	}
 
-	// save merchants
+	err = newRegisterHandler().usecase.Register(
+		user.GetAddress(),
+		req.ReceivedAddress,
+		req.Name,
+		req.Tel,
+		req.MerchantAddress,
+		req.Deposit,
+		req.CancelableTime,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	}
 
 	c.JSON(http.StatusOK, gin.H{})
 }
