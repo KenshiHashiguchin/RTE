@@ -23,11 +23,11 @@ func newMerchantHandler() *merchantHandler {
 func HandleMerchant(c *gin.Context) {
 	merchant := newMerchantHandler().usecase.GetMerchant(c.Param("address"))
 	if merchant == nil {
-		c.JSON(http.StatusOK, gin.H{"merchants": nil})
+		c.JSON(http.StatusOK, gin.H{"merchant": nil})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"merchants": res{
+	c.JSON(http.StatusOK, gin.H{"merchant": res{
 		merchant.GetAddress(),
 		merchant.GetReceivedAddress(),
 		merchant.GetName(),
