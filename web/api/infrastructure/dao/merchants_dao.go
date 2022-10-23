@@ -8,6 +8,7 @@ import (
 type IMerchantDao interface {
 	Save(merchant Merchants) error
 	Get(address string) *Merchants
+	GetById(id uint) (*Merchants, error)
 	GetAll() []Merchants
 }
 
@@ -64,4 +65,17 @@ func (o merchantDao) Get(address string) *Merchants {
 		return nil
 	}
 	return &merchant
+}
+
+func (o merchantDao) GetById(id uint) (*Merchants, error) {
+	dbmap := initDb()
+	defer dbmap.Db.Close()
+
+	var merchant Merchants
+	err := dbmap.SelectOne(&merchant, "select * from merchants where id = ?", id)
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+	return &merchant, nil
 }
