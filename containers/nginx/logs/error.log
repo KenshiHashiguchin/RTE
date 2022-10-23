@@ -10714,3 +10714,4 @@ Stack trace:
 2021/09/25 05:30:22 [alert] 11#11: unlink() "/run/nginx.pid" failed (13: Permission denied)
 2022/10/12 15:30:47 [emerg] 6#6: no host in upstream ":9000" in /etc/nginx/conf.d/upstream.conf:1
 2022/10/12 15:37:33 [emerg] 7#7: invalid number of arguments in "root" directive in /etc/nginx/sites-available/local_default.conf:13
+2022/10/23 05:40:18 [alert] 10#10: unlink() "/run/nginx.pid" failed (13: Permission denied)
