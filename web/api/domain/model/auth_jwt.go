@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/RTE/web/api/util"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -22,10 +21,14 @@ func NewUserClaims(address string) UserClaims {
 	}
 }
 
-func GetAuthUserByTokenString(tokenString string) (UserClaims, error) {
+func (u UserClaims) GetAddress() string {
+	return u.address
+}
+
+func GetAuthUserByTokenString(tokenString, key string) (UserClaims, error) {
 	auth := &UserClaims{}
 	_, err := jwt.ParseWithClaims(tokenString, auth, func(token *jwt.Token) (interface{}, error) {
-		return []byte(util.Env("JWT_SECRET_KEY")), nil
+		return []byte(key), nil
 	})
 
 	if err != nil {

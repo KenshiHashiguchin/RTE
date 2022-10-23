@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/RTE/web/api/infrastructure/dao/kvs"
-	"github.com/RTE/web/api/infrastructure/repositoryImpl"
 	"github.com/RTE/web/api/usecase"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -16,15 +15,14 @@ type reserveHandler struct {
 	usecase usecase.IAuth
 }
 
-func newReserveHandler() *authHandler {
+func newReserveHandler() *AuthHandler {
 	dao := kvs.NewUserToken()
-	userRepo := repositoryImpl.NewUserRepository()
-	return &authHandler{
-		usecase: usecase.NewAuthUseCase(dao, userRepo),
+	return &AuthHandler{
+		Usecase: usecase.NewAuthUseCase(dao),
 	}
 }
 
 func HandleReserve(c *gin.Context) {
-	// TOOD
+	// TODO
 	c.JSON(http.StatusOK, gin.H{})
 }
