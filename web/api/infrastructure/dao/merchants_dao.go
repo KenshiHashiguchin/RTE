@@ -7,6 +7,7 @@ import (
 
 type IMerchantDao interface {
 	Save(merchant Merchants) error
+	Get(address string) *Merchants
 	GetAll() []Merchants
 }
 
@@ -40,17 +41,27 @@ func (o merchantDao) Save(merchant Merchants) error {
 }
 
 func (o merchantDao) GetAll() []Merchants {
-	log.Print("GetAll")
-
 	dbmap := initDb()
 	defer dbmap.Db.Close()
 
 	var merchants []Merchants
-
 	_, err := dbmap.Select(&merchants, "select * from merchants")
 	if err != nil {
 		log.Print(err)
 		return nil
 	}
 	return merchants
+}
+
+func (o merchantDao) Get(address string) *Merchants {
+	dbmap := initDb()
+	defer dbmap.Db.Close()
+
+	var merchant Merchants
+	err := dbmap.SelectOne(&merchant, "select * from merchants where address = ?", address)
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
+	return &merchant
 }
