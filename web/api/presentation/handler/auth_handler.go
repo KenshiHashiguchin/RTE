@@ -12,10 +12,6 @@ import (
 	"net/http"
 )
 
-type IAuthHandler interface {
-	HandleRegisterUser(c *gin.Context)
-}
-
 type AuthHandler struct {
 	Usecase usecase.IAuth
 }

@@ -7,10 +7,6 @@ import (
 	"net/http"
 )
 
-type IReserveHandler interface {
-	HandleReserve(c *gin.Context)
-}
-
 type reserveHandler struct {
 	usecase usecase.IAuth
 }

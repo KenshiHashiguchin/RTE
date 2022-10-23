@@ -11,10 +11,6 @@ import (
 	"net/http"
 )
 
-type IRegisterHandler interface {
-	HandleReserve(c *gin.Context)
-}
-
 type registerHandler struct {
 	usecase usecase.IRegisterMerchant
 }
