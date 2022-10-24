@@ -1,25 +1,25 @@
 <template>
   <v-card class="elevation-0">
-    <v-toolbar card dense color="transparent">
+    <v-app-bar flat dense color="transparent">
       <v-toolbar-title><h4>Notification</h4></v-toolbar-title>
-    </v-toolbar>
+    </v-app-bar>
     <v-divider></v-divider>
     <v-card-text class="pa-0">
       <v-list two-line class="pa-0">
         <template v-for="(item, index) in items">
           <v-subheader v-if="item.header" :key="item.header">{{ item.header }}</v-subheader>
           <v-divider v-else-if="item.divider" :key="index"></v-divider>
-          <v-list-tile avatar v-else :key="item.title" @click="handleClick">
-            <v-list-tile-avatar :color="item.color">
+          <v-list-item avatar v-else :key="item.title" @click="handleClick">
+            <v-list-item-avatar :color="item.color">
               <v-icon dark>{{item.icon}}</v-icon>
-            </v-list-tile-avatar>
-            <v-list-tile-content>
-              <v-list-tile-sub-title v-html="item.title"></v-list-tile-sub-title>
-            </v-list-tile-content>
-            <v-list-tile-action class="caption">
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-subtitle v-html="item.title"></v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action class="caption">
               {{item.timeLabel}}
-            </v-list-tile-action>
-          </v-list-tile>
+            </v-list-item-action>
+          </v-list-item>
         </template>
       </v-list>
       <v-divider></v-divider>

@@ -4,7 +4,7 @@
       <v-app id="inspire" class="app">
         <app-drawer class="app--drawer"></app-drawer>
         <app-toolbar class="app--toolbar"></app-toolbar>
-        <v-content>
+        <v-main>
           <!-- Page Header -->
           <page-header></page-header>
           <div class="page-wrapper">
@@ -14,10 +14,9 @@
           <v-footer height="auto" class="white pa-3 app--footer">
             <span class="caption">&copy; {{ new Date().getFullYear() }}</span>
             <v-spacer></v-spacer>
-            <span class="caption mr-1"> Made with love </span>
-            <v-icon color="pink" small>favorite</v-icon>
+            <span class="caption mr-1"> Made with Kensh Team </span>
           </v-footer>
-        </v-content>
+        </v-main>
         <!-- Go to top -->
         <app-fab></app-fab>
         <!--&lt;!&ndash; theme setting &ndash;&gt;-->
@@ -37,8 +36,6 @@
         </v-navigation-drawer>
       </v-app>
     </template>
-
-
     <v-snackbar
       :timeout="3000"
       bottom
@@ -47,7 +44,7 @@
       v-model="snackbar.show"
     >
       {{ snackbar.text }}
-      <v-btn dark flat @click.native="snackbar.show = false" icon>
+      <v-btn dark text @click.native="snackbar.show = false" icon>
         <v-icon>close</v-icon>
       </v-btn>
     </v-snackbar>

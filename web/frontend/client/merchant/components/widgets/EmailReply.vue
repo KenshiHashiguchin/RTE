@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-toolbar color="primary" dark extended dense class="elevation-1">
+    <v-app-bar color="primary" dark extended dense class="elevation-1">
       <v-toolbar-title>Hey Michael, How are you?</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="handleClose">
@@ -32,7 +32,7 @@
           <v-icon color="grey">expand_more</v-icon>
         </v-btn>
       </div>
-    </v-toolbar>
+    </v-app-bar>
     <v-container fluid class="pa-0">
       <v-layout wrap column>
         <v-expansion-panel expand>
@@ -58,7 +58,7 @@
             <v-divider></v-divider>
             <br>
             <v-card>
-              <v-toolbar dense class="elevation-1">
+              <v-app-bar dense class="elevation-1">
               <v-btn icon>
                   <v-icon>reply</v-icon>
                 </v-btn>
@@ -67,7 +67,7 @@
                   <v-icon>expand_more</v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
-              </v-toolbar>
+              </v-app-bar>
               <v-card-text class="pa-0">
                 <v-text-field
                   class=""
@@ -77,8 +77,8 @@
                   multi-line
                 ></v-text-field>
               </v-card-text>
-              <v-toolbar dense class="elevation-1">
-                <v-btn flat icon>
+              <v-app-bar dense class="elevation-1">
+                <v-btn text icon>
                   <v-icon>send</v-icon>
                 </v-btn>
                 <v-btn icon>
@@ -91,7 +91,7 @@
                   <v-icon>camera</v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
-              </v-toolbar>
+              </v-app-bar>
             </v-card>
           </div>
         </div>
@@ -109,8 +109,8 @@ export default {
   }),
   methods: {
     handleClose (e) {
-      if (typeof window === 'undefined') return;
-      window.AppMail.$emit('MAIL_REPLY_DIALOG_CLOSE');
+      // if (typeof window === 'undefined') return;
+      // window.AppMail.$emit('MAIL_REPLY_DIALOG_CLOSE');
     }
   },
 };
