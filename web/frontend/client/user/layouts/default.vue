@@ -1,5 +1,9 @@
 <template>
-  <div>
-    <Nuxt/>
+  <div id="appRoot">
+    <nuxt />
   </div>
 </template>
+
+<script>
+export default {}
+</script>

@@ -1,16 +1,20 @@
 require('dotenv').config()
 const environment = process.env.APP_ENV || 'local'
 const appType = process.env.APP_TYPE || 'user'
+console.log('appType')
+console.log(appType)
+console.log(environment)
 const envSet = require(`./nuxt_env/env.${appType}_${environment}.js`)
 const buildConfSet = require(`./nuxt_env/rte.build_config.js`)
+const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 
 export default {
   env: {
     name: environment,
     userAppUrl: process.env.APP_USER_URL,
-    shopAppUrl: process.env.APP_MERCHANT_URL,
+    merchantAppUrl: process.env.APP_MERCHANT_URL,
   },
-  srcDir: `client/${appType}`,
+  srcDir: `client/${appType}/`,
 
   render: {
     compressor: (req, res, next) => {
@@ -36,7 +40,12 @@ export default {
     // '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/stylelint
     // '@nuxtjs/stylelint-module',
+    '@nuxtjs/vuetify',
   ],
+  vuetify: {
+    customVariables: ['~/assets/style/scss/variables.scss'],
+    treeShake: true
+  },
   moment: {
     locales: ['ja'],
   },
@@ -51,8 +60,12 @@ export default {
       },
     ],
   ],
+  loading: {color: '#3adced'},
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
+    transpile: [
+      'vee-validate/dist/rules'
+    ],
     extractCSS: true,
     devtools: process.env.APP_DEBUG === 'true',
     html: {
@@ -71,6 +84,13 @@ export default {
         collapseWhitespace: true,
       },
     },
+    // transpile: ['vuetify/lib'],
+    // plugins: [new VuetifyLoaderPlugin()],
+    // loaders: {
+    //   stylus: {
+    //     import: ["~/assets/style/variables.styl"]
+    //   }
+    // },
     // build.templates local設定
     // templates: [
     //   {
