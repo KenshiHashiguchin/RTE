@@ -22,6 +22,7 @@ func (r *Register) Validate() (ok bool, error map[string]string) {
 		for i := range errors {
 			if errors[i].Tag() == "required" {
 				result["ReceivedAddress"] = "入力必須です。"
+				ok = false
 				continue
 			}
 			switch errors[i].StructField() {
@@ -51,6 +52,9 @@ func (r *Register) Validate() (ok bool, error map[string]string) {
 
 	if validateAddress(r.ReceivedAddress) != true {
 		result["Address"] = "不正なアドレス形式です"
+	}
+
+	if len(result) > 0 {
 		return false, result
 	}
 
