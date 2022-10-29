@@ -3,3 +3,6 @@
 tmp
 /*.logs
 .DS_Store
+.env
+go.sum
+gin.log

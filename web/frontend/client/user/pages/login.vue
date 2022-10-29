@@ -50,6 +50,15 @@ export default {
   },
   methods: {
     ...mapMutations('web3', ['registerWeb3Instance']),
+    async login () {
+      try {
+        await this.initWeb3()
+        await this.getToken()
+        await this.$router.push('/')
+      }catch(e){
+        console.log(e)
+      }
+    },
     async initWeb3() {
       // Check for web3 provider
       if (typeof window.ethereum !== 'undefined') {
@@ -78,6 +87,15 @@ export default {
       else {
         console.error('No web3 provider detected');
         this.errorMessage = "No web3 provider detected. Did you install the Metamask extension on this browser?";
+      }
+    },
+    async getToken(){
+      try {
+        const {data} = await this.$axios.get(`/api/token/${this.web3.address}`)
+        console.log(data)
+      } catch (e) {
+        // todo
+        this.error = e
       }
     }
   }
