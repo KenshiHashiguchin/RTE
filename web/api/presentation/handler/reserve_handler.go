@@ -5,7 +5,6 @@ import (
 	"github.com/RTE/web/api/infrastructure/repositoryImpl"
 	"github.com/RTE/web/api/presentation/request"
 	"github.com/RTE/web/api/usecase"
-	"github.com/RTE/web/api/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -31,15 +30,10 @@ func HandleReserve(c *gin.Context) {
 		return
 	}
 
-	num := util.ConvertStringToUint(c.PostForm("number"))
-	date := util.ConvertStringToTime(c.PostForm("time"))
-	req := request.Reserve{
-		c.PostForm("merchant_address"),
-		c.PostForm("surname"),
-		c.PostForm("firstname"),
-		c.PostForm("phonenumber"),
-		num,
-		date,
+	var req request.Reserve
+	if err = c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
 	}
 	ok, errMessage := req.Validate()
 	if ok != true {

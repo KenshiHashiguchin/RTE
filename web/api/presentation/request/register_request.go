@@ -5,12 +5,12 @@ import (
 )
 
 type Register struct {
-	ReceivedAddress string `validate:"required"`
-	Name            string `validate:"required,max=30"`
-	Tel             string `validate:"required,max=12"`
-	MerchantAddress string `validate:"required"`
-	Deposit         uint   `validate:"required,min=0"`
-	CancelableTime  uint   `validate:"required,min=0"`
+	ReceivedAddress string `json:"received_address" validate:"required"`
+	Name            string `json:"name" validate:"required,max=30"`
+	Tel             string `json:"tel" validate:"required,max=12"`
+	MerchantAddress string `json:"merchant_address" validate:"required"`
+	Deposit         uint   `json:"deposit" validate:"required,min=0"`
+	CancelableTime  uint   `json:"cancelable_time" validate:"required,min=0"`
 }
 
 func (r *Register) Validate() (ok bool, error map[string]string) {

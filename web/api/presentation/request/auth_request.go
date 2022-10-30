@@ -5,8 +5,8 @@ import (
 )
 
 type Auth struct {
-	Address   string `validate:"required"`
-	Signature string `validate:"required"`
+	Address   string `json:"address" validate:"required"`
+	Signature string `json:"signature" validate:"required"`
 }
 
 func (t *Auth) Validate() (ok bool, error map[string]string) {

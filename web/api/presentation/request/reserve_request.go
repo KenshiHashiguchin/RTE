@@ -6,12 +6,12 @@ import (
 )
 
 type Reserve struct {
-	MerchantAddress string    `validate:"required"`
-	Surname         string    `validate:"required,max=30"`
-	Firstname       string    `validate:"required,max=30"`
-	Phonenumber     string    `validate:"required,max=12"`
-	Number          uint      `validate:"required,min=1,max=100"`
-	Time            time.Time `validate:"required,min=1,max=100"`
+	MerchantAddress string    `json:"merchant_address" validate:"required"`
+	Surname         string    `json:"surname" validate:"required,max=30"`
+	Firstname       string    `json:"firstname" validate:"required,max=30"`
+	Phonenumber     string    `json:"phonenumber" validate:"required,max=12"`
+	Number          uint      `json:"number" validate:"required,min=1,max=100"`
+	Time            time.Time `json:"time" validate:"required,min=1,max=100"`
 }
 
 func (r *Reserve) Validate() (ok bool, error map[string]string) {
