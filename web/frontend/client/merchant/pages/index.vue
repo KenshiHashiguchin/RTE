@@ -3,8 +3,9 @@
     <v-container grid-list-xl fluid>
       <v-layout row wrap>
         <v-flex lg4 sm12 xs12>
-          <vue-qrcode :value="qrCodeUrl"></vue-qrcode>
-          <!--TODO download-->
+          <client-only>
+            <vue-qrcode :value="qrCodeUrl"></vue-qrcode>
+          </client-only>
         </v-flex>
         <!-- social/weather card start -->
         <v-flex lg4 sm12 xs12>

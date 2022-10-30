@@ -2,14 +2,16 @@
   <div id="pageDashboard">
     <v-container grid-list-xl fluid>
       <v-layout row wrap>
-        <v-flex lg4 sm12 xs12>
-          <vue-qrcode :value="qrCodeUrl"></vue-qrcode>
-          <div>
-            <p>Network: {{ web3.networkId }}</p>
-            <p>Account: {{ web3.coinbase }}</p>
-            <p>Balance: {{ web3.balance }}</p>
-          </div>
-        </v-flex>
+        <client-only>
+          <v-flex lg4 sm12 xs12>
+            <vue-qrcode :value="qrCodeUrl"></vue-qrcode>
+            <div>
+              <p>Network: {{ web3.networkId }}</p>
+              <p>Account: {{ web3.coinbase }}</p>
+              <p>Balance: {{ web3.balance }}</p>
+            </div>
+          </v-flex>
+        </client-only>
         <v-flex lg4 sm12 xs12>
           <NuxtLink to="/merchant">merchants</NuxtLink>
           <NuxtLink to="/reserve">reserves</NuxtLink>
