@@ -15,4 +15,12 @@ interface ISlashCustomPlugin {
         string memory optional
     ) external payable;
 
+    /**
+     * @dev Check if the contract is Slash Plugin
+     *
+     * Requirement
+     * - Implement this function in the contract
+     * - Return true
+     */
+    function supportSlashExtensionInterface() external returns (bool);
 }

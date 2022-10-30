@@ -6,26 +6,21 @@ import "../libraries/UniversalERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {LibReserve} from "../libraries/LibApp.sol";
 
-
-interface ReserveContract {
-    function getReservation(string memory _paymentId) external view returns (LibReserve.Reserve memory);
-}
-
 contract ReceivePayment is ISlashCustomPlugin, Ownable {
     using UniversalERC20 for IERC20;
 
-    ReserveContract private reserveContract;
-
-    constructor(address _address) {
-        _reservationAddress(_address);
-    }
+    address  public reserveContract;
 
     function updateReservationContractAddress(address _newAddress) external onlyOwner {
         _reservationAddress(_newAddress);
     }
 
     function _reservationAddress(address _newAddress) internal {
-        reserveContract = ReserveContract(_newAddress);
+        reserveContract = _newAddress;
+    }
+
+    function supportSlashExtensionInterface() external returns (bool) {
+        return true;
     }
 
     function receivePayment(
@@ -37,12 +32,23 @@ contract ReceivePayment is ISlashCustomPlugin, Ownable {
         require(amount >= 0, "invalid amount");
         require(receiveToken != address(0), "invalid token");
 
-        LibReserve.Reserve memory reserve = reserveContract.getReservation(paymentId);
-
-        IERC20(receiveToken).transfer(
-            reserve.merchant,
+        address merchantAddress = getMerchantAddress(paymentId);
+        IERC20(receiveToken).universalTransferFrom(
+            msg.sender,
+            merchantAddress,
             amount
         );
-        // 受け取りトークンを保存する(paymentIdをキーに)
+    }
+
+    function getMerchant(string memory paymentId) public returns (address) {
+        bytes memory payload = abi.encodeWithSignature("getMerchant(string)", paymentId);
+        (bool success, bytes memory returnData) = address(reserveContract).call(payload);
+        return bytesToAddress(returnData);
+    }
+
+    function bytesToAddress(bytes memory bys) private pure returns (address addr) {
+        assembly {
+            addr := mload(add(bys, 20))
+        }
     }
 }

@@ -16,6 +16,11 @@ contract ReserveFacet {
         return reserve;
     }
 
+    function getMerchant(string memory _paymentId) external view returns (address) {
+        LibReserve.Reserve storage reserve = LibReserve.reserveStorage().reserve[_paymentId];
+        return reserve.merchant;
+    }
+
     function reserve(string memory _paymentId, address _merchant, address _token, uint _depositAmount, uint _cancelableTime, uint _withdrawableTime) external {
         LibReserve.validateReserve(_paymentId, _merchant, _token, _cancelableTime, _withdrawableTime);
         LibReserve.Reserve storage reserve = LibReserve.reserveStorage().reserve[_paymentId];
@@ -30,7 +35,8 @@ contract ReserveFacet {
         reserve.status = LibReserve.Status.Reserved;
 
         if (_depositAmount > 0) {
-            IERC20(_token).universalTransfer(
+            IERC20(_token).universalTransferFrom(
+                msg.sender,
                 address(this),
                 _depositAmount
             );
@@ -45,7 +51,7 @@ contract ReserveFacet {
         address[] memory feePath_,
         string memory paymentId_,
         string memory optional_
-    ) external {
+    ) external payable {
         LibReserve.isSubscriber(paymentId_);
         LibReserve.isStatusReserved(paymentId_);
 
