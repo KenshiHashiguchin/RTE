@@ -11,6 +11,7 @@ export const mutations = {
     console.log('registerWeb3instance Mutation being executed', payload)
     let result = payload
     let web3Copy = state.web3
+    console.log(result)
     web3Copy.coinbase = result.coinbase
     web3Copy.networkId = result.networkId
     web3Copy.balance = parseInt(result.balance, 10)
