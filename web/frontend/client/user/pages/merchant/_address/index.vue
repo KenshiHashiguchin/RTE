@@ -3,15 +3,10 @@
     <v-layout>
       <v-flex text-xs-center>
         <v-row dense>
-          <v-col
-            v-for="(merchant,i) in merchants"
-            :key="`merchant-card-${i}`"
-            :cols="4"
-          >
+          <v-col :cols="6">
             <v-card
               max-width="375"
-              class="mx-auto"
-              @click="goToDetail(merchant)">
+              class="mx-auto">
               <v-img
                 src="https://cdn.vuetifyjs.com/images/lists/ali.png"
                 height="150px"
@@ -54,6 +49,8 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
+              <v-btn @click="goToReserve">Reserve</v-btn>
+              <v-btn @click="cancel">cancel</v-btn>
             </v-card>
           </v-col>
         </v-row>
@@ -64,24 +61,26 @@
 
 <script>
 export default {
-  name: "ReserveCreate",
-  async asyncData(app) {
-    let merchants = []
+  name: "MerchantAddress",
+  async asyncData(app, query) {
+    let merchant = null
+    console.log(query.address)
     try {
-      const {data} = await app.$axios.get('/api/merchants')
-      merchants = data.merchants ? data.merchants : []
+      const {data} = await this.$axios.get(`/api/merchant/${query.address}`)
+      merchant = data.merchant
     } catch (e) {
       console.log(e)
     }
     return {
-      merchants
+      merchant
     }
   },
   methods: {
-    goToDetail(merchant) {
-      console.log('goToDetail')
-      console.log(merchant.address)
-      this.$router.push(`/merchant/${merchant.address}`)
+    goToReserve(merchant) {
+      this.$router.push(`/merchant/${merchant.address}/reserve`)
+    },
+    cancel() {
+      // todo open modal
     }
   }
 }
