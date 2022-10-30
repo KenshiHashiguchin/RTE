@@ -33,7 +33,7 @@
 
 <script>
 export default {
-  name: "ReserveCreate",
+  name: "MerchantReserveCreate",
   async asyncData({app, route}) {
     let merchant = null
     console.log(route.params)

@@ -66,7 +66,7 @@
 
 <script>
 export default {
-  name: "MerchantAddress",
+  name: "MerchantAddressShow",
   async asyncData({app, route}) {
     let merchant = null
     console.log(route.params)

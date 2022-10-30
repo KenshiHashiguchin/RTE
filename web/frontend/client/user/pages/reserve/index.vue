@@ -4,7 +4,9 @@
       RESERVES
       <div v-for="(reservation, i) in reservations">
         {{ reservation.surname }}
-        {{ reservation.firstname }}
+        {{ reservation.first_name }}
+        {{ reservation.phonenumber }}
+        {{ reservation.number }}
       </div>
     </v-container>
   </div>
@@ -13,13 +15,16 @@
 <script>
 export default {
   name: "ReserveIndex",
-  async asyncData({ app }) {
+  async asyncData({ app, error }) {
     let reservations = []
     try {
       const {data} = await app.$axios.get('/api/reserve_list')
       reservations = data.reservations ? data.reservations : []
     }catch (e){
-      console.log(e)
+      error({
+        statusCode: e.response.status,
+        message: e.response.data.message,
+      })
     }
     return {
       reservations
@@ -27,7 +32,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>
