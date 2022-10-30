@@ -8,7 +8,7 @@ import (
 var JWTExpHour time.Duration = 24
 
 type UserClaims struct {
-	address string `json:"address,omitempty"`
+	Address string `json:"address,omitempty"`
 	jwt.StandardClaims
 }
 
@@ -22,7 +22,7 @@ func NewUserClaims(address string) UserClaims {
 }
 
 func (u UserClaims) GetAddress() string {
-	return u.address
+	return u.Address
 }
 
 func GetAuthUserByTokenString(tokenString, key string) (UserClaims, error) {
