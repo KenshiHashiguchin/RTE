@@ -21,8 +21,8 @@ func newGetStoresHandler() *getStoresHandler {
 }
 
 type res struct {
-	Address         string `json:"adress"`
-	ReceivedAddress string `json:"received_adderss"`
+	Address         string `json:"address"`
+	ReceivedAddress string `json:"received_address"`
 	Name            string `json:"name"`
 	MerchantAddress string `json:"merchant_address"`
 	Tel             string `json:"tel"`
