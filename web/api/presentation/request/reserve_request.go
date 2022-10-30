@@ -6,12 +6,12 @@ import (
 )
 
 type Reserve struct {
-	MerchantId  uint      `validate:"required"`
-	Surname     string    `validate:"required,max=30"`
-	Firstname   string    `validate:"required,max=30"`
-	Phonenumber string    `validate:"required,max=12"`
-	Number      uint      `validate:"required,min=1,max=100"`
-	Time        time.Time `validate:"required,min=1,max=100"`
+	MerchantAddress string    `validate:"required"`
+	Surname         string    `validate:"required,max=30"`
+	Firstname       string    `validate:"required,max=30"`
+	Phonenumber     string    `validate:"required,max=12"`
+	Number          uint      `validate:"required,min=1,max=100"`
+	Time            time.Time `validate:"required,min=1,max=100"`
 }
 
 func (r *Reserve) Validate() (ok bool, error map[string]string) {
@@ -22,7 +22,7 @@ func (r *Reserve) Validate() (ok bool, error map[string]string) {
 		errors := err.(validator.ValidationErrors)
 		for i := range errors {
 			if errors[i].Tag() == "required" {
-				result["ReceivedAddress"] = "入力必須です。"
+				result[errors[i].StructField()] = "入力必須です。"
 				continue
 			}
 			switch errors[i].StructField() {
@@ -53,6 +53,10 @@ func (r *Reserve) Validate() (ok bool, error map[string]string) {
 				}
 			}
 		}
+	}
+
+	if validateAddress(r.MerchantAddress) != true {
+		result["MerchantAddress"] = "不正なアドレス形式です"
 	}
 
 	// time

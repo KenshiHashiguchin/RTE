@@ -17,9 +17,10 @@ type reserveHandler struct {
 func newReserveHandler() *reserveHandler {
 	rDao := dao.NewReserveDao()
 	mDao := dao.NewMerchantDao()
-	repo := repositoryImpl.NewReserveRepository(rDao, mDao)
+	reserveRepo := repositoryImpl.NewReserveRepository(rDao, mDao)
+	merchantRepo := repositoryImpl.NewMerchantRepository(mDao)
 	return &reserveHandler{
-		UseCase: usecase.NewReserveUseCase(repo),
+		UseCase: usecase.NewReserveUseCase(reserveRepo, merchantRepo),
 	}
 }
 
@@ -32,9 +33,8 @@ func HandleReserve(c *gin.Context) {
 
 	num := util.ConvertStringToUint(c.PostForm("number"))
 	date := util.ConvertStringToTime(c.PostForm("time"))
-	merchantId := util.ConvertStringToUint(c.PostForm("merchant_id"))
 	req := request.Reserve{
-		merchantId,
+		c.PostForm("merchant_address"),
 		c.PostForm("surname"),
 		c.PostForm("firstname"),
 		c.PostForm("phonenumber"),
@@ -47,7 +47,7 @@ func HandleReserve(c *gin.Context) {
 	}
 
 	// reserve
-	err = newReserveHandler().UseCase.Reserve(req.MerchantId, user.GetAddress(), req.Surname, req.Firstname, req.Phonenumber, req.Number)
+	err = newReserveHandler().UseCase.Reserve(req.MerchantAddress, user.GetAddress(), req.Surname, req.Firstname, req.Phonenumber, req.Number)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 	}

@@ -1,6 +1,7 @@
 package model
 
 type Merchant struct {
+	id              uint
 	address         string
 	receivedAddress string
 	name            string
@@ -10,8 +11,9 @@ type Merchant struct {
 	cancelableTime  uint
 }
 
-func NewMerchant(address, receivedAddress, name, merchantAddress, tel string, deposit, cancelableTime uint) Merchant {
+func NewMerchant(id uint, address, receivedAddress, name, merchantAddress, tel string, deposit, cancelableTime uint) Merchant {
 	return Merchant{
+		id:              id,
 		address:         address,
 		receivedAddress: receivedAddress,
 		name:            name,
@@ -20,6 +22,10 @@ func NewMerchant(address, receivedAddress, name, merchantAddress, tel string, de
 		deposit:         deposit,
 		cancelableTime:  cancelableTime,
 	}
+}
+
+func (m Merchant) GetId() uint {
+	return m.id
 }
 
 func (m Merchant) GetAddress() string {
