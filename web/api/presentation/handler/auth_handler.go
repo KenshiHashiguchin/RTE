@@ -24,7 +24,12 @@ func newAuthHandler() *AuthHandler {
 }
 
 func HandleAuth(c *gin.Context) {
-	auth := request.Auth{Address: c.PostForm("address"), Signature: c.PostForm("signature")}
+	var auth request.Auth
+	if err := c.ShouldBindJSON(&auth); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
 	ok, err := auth.Validate() // Authenticate
 	if ok != true {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err})

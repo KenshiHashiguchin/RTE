@@ -6,7 +6,6 @@ import (
 	"github.com/RTE/web/api/presentation/handler"
 	"github.com/RTE/web/api/presentation/request"
 	"github.com/RTE/web/api/usecase"
-	"github.com/RTE/web/api/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -29,16 +28,11 @@ func HandleRegister(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{})
 	}
 
-	// request
-	req := request.Register{
-		ReceivedAddress: c.PostForm("received_address"),
-		Name:            c.PostForm("name"),
-		Tel:             c.PostForm("tel"),
-		MerchantAddress: c.PostForm("merchant_address"),
-		Deposit:         util.ConvertStringToUint(c.PostForm("deposit")),
-		CancelableTime:  util.ConvertStringToUint(c.PostForm("cancelable_time")),
+	var req request.Register
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
 	}
-
 	ok, errMessage := req.Validate()
 	if ok != true {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": errMessage})
