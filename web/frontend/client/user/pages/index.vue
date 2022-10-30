@@ -35,7 +35,7 @@ import LinearStatistic from '@/components/widgets/statistic/LinearStatistic';
 import {mapGetters} from "vuex";
 
 export default {
-  layouts: 'dashboard',
+  // layouts: 'dashboard',
   components: {
     VueQrcode,
     VWidget,

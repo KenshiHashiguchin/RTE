@@ -1,26 +1,26 @@
 <template>
   <v-app id="login">
     <v-main>
-      <v-container fluid fill-height>
+      <v-main fluid fill-height>
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4 lg4>
             <v-card className="elevation-1 pa-3">
               <v-card-text>
-                <div className="layout column align-center">
+                <div class="layout column align-center">
                   <img
                     src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Metamask"
                     width="120" height="120">
-                  <h1 className="flex my-4 primary--text">TR</h1>
+                  <h1 class="flex my-4 primary--text">TR</h1>
                 </div>
               </v-card-text>
               <v-card-actions>
                 <metamask @connect="login"/>
-                <p className="italic text-red-600">{{ errorMessage }}</p>
+                <p class="italic text-red-600">{{ errorMessage }}</p>
               </v-card-actions>
             </v-card>
           </v-flex>
         </v-layout>
-      </v-container>
+      </v-main>
     </v-main>
   </v-app>
 </template>
@@ -63,6 +63,9 @@ export default {
           const instance = new Web3(window.ethereum)
           // Get necessary info on your node
           const networkId = await instance.eth.net.getId();
+          // const accounts = await instance.eth.getAccounts();
+          // console.log('---accounts---')
+          // console.log(accounts)
           const coinbase = await instance.eth.getCoinbase();
           const balance = await instance.eth.getBalance(coinbase);
           // Save it to store
@@ -103,13 +106,11 @@ export default {
       console.log('--signature Start--')
       const message = `Signature for login authentication(token:${token})`
       const instance = new Web3(window.ethereum)
-      let signature = await instance.eth.personal.sign(message, this.web3.coinbase, '');
+      let signature = await instance.eth.personal.sign(message, this.web3.coinbase);
       try {
-        const {data} = await this.$axios.get('/api/auth', {
-          params: {
-            address: this.web3.coinbase,
-            signature: signature,
-          }
+        const {data} = await this.$axios.post('/api/auth', {
+          address: this.web3.coinbase,
+          signature: signature,
         })
         console.log(data)
       } catch (e) {
