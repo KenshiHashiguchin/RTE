@@ -1,9 +1,10 @@
 <template>
   <div id="pageReserve">
     <v-container grid-list-xl fluid>
-      <div v-for="(reserve, i) in reserves">
-        {{ reserve.surname }}
-        {{ reserve.firstname }}
+      RESERVES
+      <div v-for="(reservation, i) in reservations">
+        {{ reservation.surname }}
+        {{ reservation.firstname }}
       </div>
     </v-container>
   </div>
@@ -12,12 +13,16 @@
 <script>
 export default {
   name: "ReserveIndex",
-  async asyncData() {
-    let reserves = []
-    const {data} = await this.$axios.get('/api/reserve_list')
-    reserves = data.reserves ? data.reserves : []
+  async asyncData({ app }) {
+    let reservations = []
+    try {
+      const {data} = await app.$axios.get('/api/reserve_list')
+      reservations = data.reservations ? data.reservations : []
+    }catch (e){
+      console.log(e)
+    }
     return {
-      reserves
+      reservations
     }
   }
 }

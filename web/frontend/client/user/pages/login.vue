@@ -1,7 +1,7 @@
 <template>
   <v-app id="login">
     <v-main>
-      <v-main fluid fill-height>
+      <v-container fluid fill-height>
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4 lg4>
             <v-card className="elevation-1 pa-3">
@@ -20,7 +20,7 @@
             </v-card>
           </v-flex>
         </v-layout>
-      </v-main>
+      </v-container>
     </v-main>
   </v-app>
 </template>
@@ -33,9 +33,11 @@ import Metamask from "~~/client/merchant/components/Metamask";
 export default {
   components: {Metamask},
   layout: 'default',
-  data: () => ({
-    errorMessage: '',
-  }),
+  data() {
+    return {
+      errorMessage: '',
+    }
+  },
   computed: {
     ...mapGetters('web3', ['getInstance']),
     web3() {
@@ -111,11 +113,9 @@ export default {
         let signature = await instance.eth.personal.sign(message, this.web3.coinbase);
 
         // req
-        const submitData = new FormData();
-        submitData.append('address', this.web3.coinbase)
-        submitData.append('signature', signature)
-        await this.$axios.post('/api/auth', submitData, {
-          headers: { 'content-type': 'multipart/form-data' },
+        await this.$axios.post('/api/auth',  {
+          address : this.web3.coinbase,
+          signature: signature,
         })
       } catch (e) {
         this.errorMessage = ''
