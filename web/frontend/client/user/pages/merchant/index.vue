@@ -64,7 +64,7 @@
 
 <script>
 export default {
-  name: "ReserveCreate",
+  name: "MerchantIndex",
   async asyncData(app) {
     let merchants = []
     try {
@@ -81,7 +81,7 @@ export default {
     goToDetail(merchant) {
       console.log('goToDetail')
       console.log(merchant.address)
-      this.$router.push(`/merchant/${merchant.address}`)
+      this.$router.push(`/merchant/${merchant.address}/show`)
     }
   }
 }
