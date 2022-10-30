@@ -25,6 +25,7 @@ func (u merchantImpl) GetMerchant(address string) *model.Merchant {
 		return nil
 	}
 	merchant := model.NewMerchant(
+		data.Id,
 		data.Address,
 		data.ReceivedAddress,
 		data.Name,
@@ -42,6 +43,7 @@ func (u merchantImpl) GetMerchants() []model.Merchant {
 	var merchants []model.Merchant
 	for _, data := range merchantData {
 		merchant := model.NewMerchant(
+			data.Id,
 			data.Address,
 			data.ReceivedAddress,
 			data.Name,

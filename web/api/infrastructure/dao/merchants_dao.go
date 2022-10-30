@@ -26,7 +26,6 @@ type Merchant struct {
 	MerchantAddress string    `db:"merchant_address"`
 	CreateTs        time.Time `db:"create_ts"`
 	UpdateTs        time.Time `db:"update_ts"`
-	//DeleteTs        sql.NullTime `db:"delete_ts"`
 }
 
 func NewMerchantDao() IMerchantDao {

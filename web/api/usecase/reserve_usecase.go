@@ -1,24 +1,30 @@
 package usecase
 
 import (
+	"errors"
 	"github.com/RTE/web/api/domain/model"
 	"github.com/RTE/web/api/domain/repository"
 )
 
 type IReserve interface {
-	Reserve(merchantId uint, reservedAddress, surname, firstname, tel string, number uint) error
+	Reserve(merchantAddress, reservedAddress, surname, firstname, tel string, number uint) error
 }
 
 type reserve struct {
-	repo repository.ReserveRepository
+	reserveRepo  repository.ReserveRepository
+	merchantRepo repository.MerchantRepository
 }
 
-func NewReserveUseCase(repo repository.ReserveRepository) IReserve {
-	return &reserve{repo}
+func NewReserveUseCase(reserveRepo repository.ReserveRepository, merchantRepo repository.MerchantRepository) IReserve {
+	return &reserve{reserveRepo, merchantRepo}
 }
 
-func (t reserve) Reserve(merchantId uint, reservedAddress, surname, firstname, tel string, number uint) error {
+func (t reserve) Reserve(merchantAddress, reservedAddress, surname, firstname, tel string, number uint) error {
 	paymentId, _ := model.GeneratePaymentId()
-	reservation := model.NewReservation(paymentId, merchantId, reservedAddress, surname, firstname, tel, number)
-	return t.repo.Save(reservation)
+	merchant := t.merchantRepo.GetMerchant(merchantAddress)
+	if merchant == nil {
+		return errors.New("Don't exist")
+	}
+	reservation := model.NewReservation(paymentId, merchant.GetId(), reservedAddress, surname, firstname, tel, number)
+	return t.reserveRepo.Save(reservation)
 }
