@@ -4,25 +4,19 @@
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4 lg4>
-            <v-card class="elevation-1 pa-3">
+            <v-card className="elevation-1 pa-3">
               <v-card-text>
-                <div class="layout column align-center">
+                <div className="layout column align-center">
                   <img
                     src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Metamask"
                     width="120" height="120">
-                  <h1 class="flex my-4 primary--text">RTE Admin</h1>
+                  <h1 className="flex my-4 primary--text">TR</h1>
                 </div>
               </v-card-text>
               <v-card-actions>
-                <metamask @connect="initWeb3"/>
-                <p class="italic text-red-600">{{ errorMessage }}</p>
+                <metamask @connect="login"/>
+                <p className="italic text-red-600">{{ errorMessage }}</p>
               </v-card-actions>
-              <div>
-                <p>//TODO move to another page</p>
-                <p>Network: {{ web3.networkId }}</p>
-                <p>Account: {{ web3.coinbase }}</p>
-                <p>Balance: {{ web3.balance }}</p>
-              </div>
             </v-card>
           </v-flex>
         </v-layout>
@@ -33,11 +27,11 @@
 
 <script>
 import Web3 from 'web3'
-import { mapGetters, mapMutations } from 'vuex';
+import {mapGetters, mapMutations} from 'vuex';
 import Metamask from "~~/client/merchant/components/Metamask";
 
 export default {
-  components: { Metamask },
+  components: {Metamask},
   layout: 'default',
   data: () => ({
     errorMessage: '',
@@ -50,12 +44,13 @@ export default {
   },
   methods: {
     ...mapMutations('web3', ['registerWeb3Instance']),
-    async login () {
+    async login() {
       try {
         await this.initWeb3()
-        await this.getToken()
+        const token = await this.getToken()
+        await this.signature(token)
         await this.$router.push('/')
-      }catch(e){
+      } catch (e) {
         console.log(e)
       }
     },
@@ -64,7 +59,7 @@ export default {
       if (typeof window.ethereum !== 'undefined') {
         try {
           // Ask to connect
-          await window.ethereum.send('eth_requestAccounts');
+          await window.ethereum.request({method: 'eth_accounts'})
           const instance = new Web3(window.ethereum)
           // Get necessary info on your node
           const networkId = await instance.eth.net.getId();
@@ -89,14 +84,34 @@ export default {
         this.errorMessage = "No web3 provider detected. Did you install the Metamask extension on this browser?";
       }
     },
-    async getToken(){
+    async getToken() {
+      console.log('--getToken Start--')
+      let token = null
       try {
-        const {data} = await this.$axios.get(`/api/token/${this.web3.address}`)
+        const {data} = await this.$axios.get(`/api/token/${this.web3.coinbase}`)
         console.log(data)
+        token = data.token
       } catch (e) {
         // todo
         this.error = e
       }
+      console.log('--getToken End--')
+      return token
+    },
+    async signature(token) {
+      console.log('--signature Start--')
+      try {
+        const {data} = await this.$axios.get('/api/auth', {
+          params: {
+            address: this.web3.coinbase,
+            token: token,
+          }
+        })
+        console.log(data)
+      } catch (e) {
+        this.errorMessage = ''
+      }
+      console.log('--signature End--')
     }
   }
 }

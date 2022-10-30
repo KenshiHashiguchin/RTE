@@ -5,11 +5,13 @@
         <v-flex lg4 sm12 xs12>
           <vue-qrcode :value="qrCodeUrl"></vue-qrcode>
           <div>
-            <p>//TODO move to another page</p>
             <p>Network: {{ web3.networkId }}</p>
             <p>Account: {{ web3.coinbase }}</p>
             <p>Balance: {{ web3.balance }}</p>
           </div>
+        </v-flex>
+        <v-flex lg4 sm12 xs12>
+          <NuxtLink to="/merchant">merchants</NuxtLink>
         </v-flex>
       </v-layout>
     </v-container>
