@@ -44,7 +44,6 @@ contract ReserveFacet {
     }
 
     function settleReservation(
-        address payingToken_,
         uint256 amountIn_,
         uint256 requiredAmountOut_,
         address[] memory path_,
@@ -60,10 +59,10 @@ contract ReserveFacet {
         require(amountIn_ >= reserve.depositAmount, "Excess payments");
 
         uint256 amount = amountIn_.sub(reserve.depositAmount);
-        IERC20(payingToken_).universalTransfer(address(this), amount);
+        IERC20(reserve.token).universalTransfer(address(this), amount);
 
         IERC20(reserve.token).approve(reserveStorage.swapSubmitAddress, amountIn_);
-        ISlashSubmitTransaction(reserveStorage.swapSubmitAddress).submitTransaction(payingToken_, amountIn_, requiredAmountOut_, path_, feePath_, paymentId_, optional_, bytes(""));
+        ISlashSubmitTransaction(reserveStorage.swapSubmitAddress).submitTransaction(reserve.token, amountIn_, requiredAmountOut_, path_, feePath_, paymentId_, optional_, bytes(""));
 
         reserve.status = LibReserve.Status.Settled;
         reserve.additionalAmount = amount;

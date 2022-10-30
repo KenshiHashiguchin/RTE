@@ -31,7 +31,7 @@ contract ReceivePayment is ISlashCustomPlugin, Ownable {
         require(amount >= 0, "invalid amount");
         require(receiveToken != address(0), "invalid token");
 
-        address merchantAddress = getMerchantAddress(paymentId);
+        address merchantAddress = getMerchant(paymentId);
         IERC20(receiveToken).universalTransferFrom(
             msg.sender,
             merchantAddress,
@@ -47,7 +47,7 @@ contract ReceivePayment is ISlashCustomPlugin, Ownable {
 
     function bytesToAddress(bytes memory bys) private pure returns (address addr) {
         assembly {
-            addr := mload(add(bys, 20))
+            addr := mload(add(bys, 32))
         }
     }
 }
