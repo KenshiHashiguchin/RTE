@@ -54,6 +54,11 @@
             </v-card>
           </v-col>
         </v-row>
+        <v-row dense>
+          <NuxtLink to="/merchant">
+            <v-btn>back</v-btn>
+          </NuxtLink>
+        </v-row>
       </v-flex>
     </v-layout>
   </v-container>
@@ -62,11 +67,11 @@
 <script>
 export default {
   name: "MerchantAddress",
-  async asyncData(app, query) {
+  async asyncData({app, route}) {
     let merchant = null
-    console.log(query.address)
+    console.log(route.params)
     try {
-      const {data} = await this.$axios.get(`/api/merchant/${query.address}`)
+      const {data} = await app.$axios.get(`/api/merchant/${route.params.address}`)
       merchant = data.merchant
     } catch (e) {
       console.log(e)
@@ -77,7 +82,7 @@ export default {
   },
   methods: {
     goToReserve(merchant) {
-      this.$router.push(`/merchant/${merchant.address}/reserve`)
+      this.$router.push(`/merchant/${this.merchant.address}/reserve/create`)
     },
     cancel() {
       // todo open modal

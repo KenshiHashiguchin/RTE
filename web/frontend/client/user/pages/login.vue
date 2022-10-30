@@ -46,7 +46,7 @@ export default {
     ...mapMutations('web3', ['registerWeb3Instance']),
     async login() {
       try {
-        await this.initWeb3()
+        await this.connect()
         const token = await this.getToken()
         await this.signature(token)
         await this.$router.push('/')
@@ -54,7 +54,7 @@ export default {
         console.log(e)
       }
     },
-    async initWeb3() {
+    async connect() {
       // Check for web3 provider
       if (typeof window.ethereum !== 'undefined') {
         try {
@@ -71,6 +71,7 @@ export default {
             coinbase,
             balance
           });
+
           this.errorMessage = '';
         } catch (error) {
           // User denied account access
@@ -100,11 +101,14 @@ export default {
     },
     async signature(token) {
       console.log('--signature Start--')
+      const message = `Signature for login authentication(token:${token})`
+      const instance = new Web3(window.ethereum)
+      let signature = await instance.eth.personal.sign(message, this.web3.coinbase, '');
       try {
         const {data} = await this.$axios.get('/api/auth', {
           params: {
             address: this.web3.coinbase,
-            token: token,
+            signature: signature,
           }
         })
         console.log(data)

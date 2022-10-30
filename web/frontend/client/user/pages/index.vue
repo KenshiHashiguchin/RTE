@@ -12,6 +12,7 @@
         </v-flex>
         <v-flex lg4 sm12 xs12>
           <NuxtLink to="/merchant">merchants</NuxtLink>
+          <NuxtLink to="/reserve">reserves</NuxtLink>
         </v-flex>
       </v-layout>
     </v-container>
