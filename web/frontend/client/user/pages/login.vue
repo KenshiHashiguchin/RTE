@@ -105,14 +105,18 @@ export default {
     async signature(token) {
       console.log('--signature Start--')
       const message = `Signature for login authentication(token:${token})`
-      const instance = new Web3(window.ethereum)
-      let signature = await instance.eth.personal.sign(message, this.web3.coinbase);
       try {
-        const {data} = await this.$axios.post('/api/auth', {
-          address: this.web3.coinbase,
-          signature: signature,
+        // sign
+        const instance = new Web3(window.ethereum)
+        let signature = await instance.eth.personal.sign(message, this.web3.coinbase);
+
+        // req
+        const submitData = new FormData();
+        submitData.append('address', this.web3.coinbase)
+        submitData.append('signature', signature)
+        await this.$axios.post('/api/auth', submitData, {
+          headers: { 'content-type': 'multipart/form-data' },
         })
-        console.log(data)
       } catch (e) {
         this.errorMessage = ''
       }
