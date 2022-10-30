@@ -4,12 +4,11 @@ pragma solidity ^0.8.0;
 import "./interfaces/ISlashCustomPlugin.sol";
 import "../libraries/UniversalERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import {LibReserve} from "../libraries/LibApp.sol";
 
 contract ReceivePayment is ISlashCustomPlugin, Ownable {
     using UniversalERC20 for IERC20;
 
-    address  public reserveContract;
+    address public reserveContract;
 
     function updateReservationContractAddress(address _newAddress) external onlyOwner {
         _reservationAddress(_newAddress);
