@@ -52,54 +52,54 @@
 </template>
 
 <script>
-  import AppDrawer from '@/components/AppDrawer'
-  import AppToolbar from '@/components/AppToolbar'
-  import AppFab from '@/components/AppFab'
-  import PageHeader from '@/components/PageHeader'
-  import ThemeSettings from '@/components/ThemeSettings'
+import AppDrawer from '@/components/AppDrawer'
+import AppToolbar from '@/components/AppToolbar'
+import AppFab from '@/components/AppFab'
+import PageHeader from '@/components/PageHeader'
+import ThemeSettings from '@/components/ThemeSettings'
 
-  export default {
-    components: {
-      AppDrawer,
-      AppToolbar,
-      AppFab,
-      PageHeader,
-      ThemeSettings
-    },
-    data: () => ({
-      expanded: true,
-      rightDrawer: false,
-      snackbar: {
-        show: false,
-        text: '',
-        color: '',
-      }
-    }),
+export default {
+  components: {
+    AppDrawer,
+    AppToolbar,
+    AppFab,
+    PageHeader,
+    ThemeSettings
+  },
+  data: () => ({
+    expanded: true,
+    rightDrawer: false,
+    snackbar: {
+      show: false,
+      text: '',
+      color: '',
+    }
+  }),
 
-    methods: {
-      openThemeSettings() {
-        this.$vuetify.goTo(0)
-        this.rightDrawer = (!this.rightDrawer)
-      }
+  methods: {
+    openThemeSettings() {
+      this.$vuetify.goTo(0)
+      this.rightDrawer = (!this.rightDrawer)
     }
   }
+}
 </script>
 
 <style lang="scss" scoped>
-  .setting-fab {
-    top: 50% !important;
-    right: 0;
-    border-radius: 0
-  }
+.setting-fab {
+  top: 50% !important;
+  right: 0;
+  border-radius: 0
+}
 
-  .page-wrapper {
-    min-height: calc(100vh - 64px - 50px - 81px);
-    margin-bottom: 50px;
-  }
+.page-wrapper {
+  min-height: calc(100vh - 64px - 50px - 81px);
+  margin-bottom: 50px;
+}
 
-  .app--footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-  }
+.app--footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
 </style>
