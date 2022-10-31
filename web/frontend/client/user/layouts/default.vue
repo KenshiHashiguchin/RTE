@@ -1,6 +1,8 @@
 <template>
   <div id="appRoot">
-    <nuxt />
+    <v-app>
+      <nuxt />
+    </v-app>
   </div>
 </template>
 
