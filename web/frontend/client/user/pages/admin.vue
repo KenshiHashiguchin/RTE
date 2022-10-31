@@ -74,14 +74,9 @@ export default {
           // Ask to connect
           await window.ethereum.request({method: 'eth_requestAccounts'})
           const instance = new Web3(window.ethereum)
-          // Get necessary info on your node
           const networkId = await instance.eth.net.getId();
-          // const accounts = await instance.eth.getAccounts();
-          // console.log('---accounts---')
-          // console.log(accounts)
           const coinbase = await instance.eth.getCoinbase();
           const balance = await instance.eth.getBalance(coinbase);
-          // Save it to store
           this.registerWeb3Instance({
             networkId,
             coinbase,
