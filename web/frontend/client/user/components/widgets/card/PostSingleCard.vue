@@ -18,7 +18,7 @@
         <div class="post--meta grey--text text--darken-1 caption my-3">
           <span class="mr-3">{{author}}</span>
           <time>{{createdAt }}</time>
-        </div>             
+        </div>
         <div class="post--desc text--secondary">
           {{desc}}
         </div>
@@ -40,11 +40,11 @@
           <v-btn outline flat color="primary">
             More
           </v-btn>
-        </div>    
+        </div>
       </div>
     </v-card-text>
     <v-divider></v-divider>
-    <v-toolbar card color="white">
+    <v-app-bar flat color="white">
         <v-text-field
         flat
         solo
@@ -52,7 +52,7 @@
         append-icon="photo_camera"
         hide-details=""
         ></v-text-field>
-    </v-toolbar>
+    </v-app-bar>
   </v-card>
 </template>
 
@@ -78,7 +78,7 @@ export default {
     handleFavorite () {
       // implement your own method here
     },
-  }  
+  }
 
 };
 </script>

@@ -1,10 +1,10 @@
 <template>
   <div id="themeSetting">
-    <v-toolbar color="blue" dark>
+    <v-app-bar color="blue" dark>
       <v-toolbar-title>
         Theme Settings
       </v-toolbar-title>
-    </v-toolbar>
+    </v-app-bar>
     <v-container>
       <v-layout column>
         <v-flex>
@@ -33,10 +33,10 @@
             <v-divider></v-divider>
             <div class="my-3">
               <v-btn-toggle v-model="sideBarOption">
-                <v-btn flat value="dark">
+                <v-btn text value="dark">
                   Dark
                 </v-btn>
-                <v-btn flat value="light">
+                <v-btn text value="light">
                   Light
                 </v-btn>
               </v-btn-toggle>

@@ -36,7 +36,7 @@ module.exports = {
   },
   css: [
     // 'assets/style/theme.styl',
-    // 'assets/style/app.styl',
+    'assets/style/scss/app.scss',
     'font-awesome/css/font-awesome.css',
     'roboto-fontface/css/roboto/roboto-fontface.css'
   ],

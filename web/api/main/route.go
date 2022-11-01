@@ -11,7 +11,7 @@ func route(r *gin.Engine) {
 	api := r.Group("api")
 	{
 		api.GET("/token/:address", handler.HandleGetUserToken)
-		api.GET("/auth", handler.HandleAuth) //TODO POST
+		api.POST("/auth", handler.HandleAuth)
 		api.GET("/merchants", handler.HandleGetStores)
 		api.GET("/merchant/:address", handler.HandleMerchant)
 		api.GET("/reserve_list", handler.HandleReserveList)

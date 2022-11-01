@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -25,8 +26,7 @@ func NewUserSignature(addr, sig, token string) userSignature {
 }
 
 func (userSignature userSignature) Verify() error {
-	//msg := accounts.TextHash([]byte(fmt.Sprintf(rowMessage,userSignature.token)))
-	msg := accounts.TextHash([]byte(userSignature.token))
+	msg := accounts.TextHash([]byte(fmt.Sprintf(rowMessage, userSignature.token)))
 
 	sig, err := hexutil.Decode(userSignature.signature)
 	if err != nil {
