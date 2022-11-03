@@ -38,12 +38,14 @@ func HandleReserve(c *gin.Context) {
 	ok, errMessage := req.Validate()
 	if ok != true {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": errMessage})
+		return
 	}
 
 	// reserve
 	err = newReserveHandler().UseCase.Reserve(req.MerchantAddress, user.GetAddress(), req.Surname, req.Firstname, req.Phonenumber, req.Number)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{})
