@@ -1,3 +1,8 @@
-// Import Vuetify styling
-//@import '~vuetify/src/styles/a.sass';
-//@import 'vuetify/dist/vuetify.min.css';
+body {
+  //background: #17181c;
+}
+
+.card-gradient {
+  box-shadow: -20px 20px 70px rgb(128 222 234 / 70%), 20px -20px 70px rgb(62 185 252 / 70%) !important;
+  //background-image: linear-gradient(to right, #92fe9d 0%, #00c9ff 100%);
+}

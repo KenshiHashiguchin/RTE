@@ -1,4 +1,5 @@
 export const state = () => ({
+  isListening: false,
   web3: {
     networkId: null,
     coinbase: null,
@@ -17,6 +18,9 @@ export const mutations = {
     web3Copy.balance = parseInt(result.balance, 10)
     state.web3 = web3Copy
   },
+  updateIsListening(state, payload){
+    state.isListening = payload
+  }
 }
 
 export const actions = {}
