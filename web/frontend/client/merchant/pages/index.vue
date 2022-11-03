@@ -8,7 +8,7 @@
             <v-card class="elevation-1 pa-3">
               <v-card-text>
                 <div class="layout column align-center">
-                  <h1 class="flex my-4 primary--text">Trust Reserve Admin</h1>
+                  <h1 class="flex my-4 primary--text">Trust Reserve</h1>
                 </div>
               </v-card-text>
               <div class="layout column align-center">

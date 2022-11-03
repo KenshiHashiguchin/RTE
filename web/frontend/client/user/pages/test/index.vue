@@ -1,9 +1,14 @@
 <template>
   <div>
+    <h1>
+      API&CONTRACT TEST
+    </h1>
     <div>
-      API TEST
-    </div>
-    <div>
+      <h2>CONTRACT</h2>
+      <v-text-field label="paymentId(string)" v-model="paymentId"/>
+      <v-btn @click="getContract">getReservation</v-btn>
+      <v-divider></v-divider>
+      <h2>API</h2>
       <v-btn @click="getToken">getToken</v-btn>
       <v-btn @click="signature">signature</v-btn>
       <v-btn @click="merchants">merchants</v-btn>
@@ -17,7 +22,15 @@
 <script>
 export default {
   name: "TestIndex",
+  data() {
+    return {
+      paymentId: 'test'
+    }
+  },
   methods: {
+    async getContract(){
+
+    },
     /**
      * 署名用トークンを取得
      * GET  /api/token/:address

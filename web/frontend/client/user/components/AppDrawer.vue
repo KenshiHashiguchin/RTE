@@ -11,7 +11,7 @@
     <v-app-bar color="primary darken-1" dark>
       <img src="../static/m.png" height="36" alt="Vue Material Admin Template">
       <v-toolbar-title class="ml-0 pl-3">
-        <span class="hidden-sm-and-down">RTE ADMIN</span>
+        <span class="hidden-sm-and-down">Trust Reserve</span>
       </v-toolbar-title>
     </v-app-bar>
     <client-only>
