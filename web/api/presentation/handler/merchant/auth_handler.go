@@ -33,6 +33,7 @@ func HandleAuth(c *gin.Context) {
 	token, authErr := u.Auth(auth.Address, auth.Signature)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": authErr.Error()})
+		return
 	}
 
 	session := sessions.Default(c)
