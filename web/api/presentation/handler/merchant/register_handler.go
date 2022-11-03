@@ -26,6 +26,7 @@ func HandleRegister(c *gin.Context) {
 	user, err := handler.AuthUser(c)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{})
+		return
 	}
 
 	var req request.Register
@@ -50,6 +51,7 @@ func HandleRegister(c *gin.Context) {
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{})
