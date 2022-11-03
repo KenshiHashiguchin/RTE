@@ -39,30 +39,30 @@
             <div class="text-center">
               <NuxtLink class="d-block" to="/merchant">
                 <v-icon>store</v-icon>
+                <div class="mt-2">
+                  <span class="d-inline-block">merchants</span>
+                </div>
               </NuxtLink>
-              <div class="mt-2">
-                <span class="d-inline-block">merchants</span>
-              </div>
             </div>
           </v-flex>
           <v-flex md4>
             <div class="text-center">
               <NuxtLink class="d-block" to="/reserve">
                 <v-icon>mdi-calendar-check-outline</v-icon>
+                <div class="mt-2">
+                  <span class="d-inline-block">reservations</span>
+                </div>
               </NuxtLink>
-              <div class="mt-2">
-                <span class="d-inline-block">reservations</span>
-              </div>
             </div>
           </v-flex>
           <v-flex md4>
             <div class="text-center">
               <NuxtLink class="d-block" to="/setting">
                 <v-icon>mdi-cog-outline</v-icon>
+                <div class="mt-2">
+                  <span class="d-inline-block">settings</span>
+                </div>
               </NuxtLink>
-              <div class="mt-2">
-                <span class="d-inline-block">settings</span>
-              </div>
             </div>
           </v-flex>
         </v-layout>
