@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import {LibReserve} from "../libraries/LibApp.sol";
-import {LibMerchant} from "../libraries/LibMerchant.sol";
+import {LibExp} from "../libraries/LibExp.sol";
 import "../libraries/UniversalERC20.sol";
 import "../interfaces/IUniswapV2Router02.sol";
 
@@ -63,7 +63,8 @@ contract ReserveFacet {
         reserve.status = LibReserve.Status.Settled;
         reserve.additionalAmount = amount;
 
-        // TODO SBT
+        LibExp.ExpStorage storage expStorage = LibExp.expStorage();
+        expStorage.executionPoint[msg.sender]++;
     }
 
     function cancel(string memory _paymentId) external {
@@ -99,6 +100,9 @@ contract ReserveFacet {
             reserve.merchant,
             _deadline
         );
+
+        LibExp.ExpStorage storage expStorage = LibExp.expStorage();
+        expStorage.failurePoint[reserve.subscriber]++;
     }
 
     function transferSwapSubmitAddress(address _newAddress) external {
@@ -109,6 +113,18 @@ contract ReserveFacet {
 
     function swapSubmitAddress() external view returns (address) {
         return LibReserve.reserveStorage().swapSubmitAddress;
+    }
+
+    function failurePoint(address account) external view returns (uint256) {
+        require(account != address(0), "Zero address has no balance.");
+        LibExp.ExpStorage storage expStorage = LibExp.expStorage();
+        return expStorage.failurePoint[account];
+    }
+
+    function executionPoint(address account) external view returns (uint256) {
+        require(account != address(0), "Zero address has no balance.");
+        LibExp.ExpStorage storage expStorage = LibExp.expStorage();
+        return expStorage.executionPoint[account];
     }
 
 }

@@ -51,7 +51,6 @@ describe('ReserveFacetTest', async function () {
   })
 
   it('owner can change swapSubmitAddress', async () => {
-    console.log(await reserveFacet.swapSubmitAddress());
     expect(await reserveFacet.swapSubmitAddress()).not.equal(mockedRouterContract.address)
     await reserveFacet.transferSwapSubmitAddress(mockedRouterContract.address)
     expect(await reserveFacet.swapSubmitAddress()).equal(mockedRouterContract.address)
@@ -73,6 +72,8 @@ describe('ReserveFacetTest', async function () {
     expect(reservation.cancelableTime).equal(now + cancelableTime)
     expect(reservation.withdrawableTime).equal(now + withdrawableTime)
     expect(reservation.status).equal(status.Reserved)
+    expect(await reserveFacet.executionPoint(subscriberAddress.address)).equal(0);
+    expect(await reserveFacet.failurePoint(subscriberAddress.address)).equal(0);
   })
 
   it('cancel', async () => {
@@ -85,6 +86,8 @@ describe('ReserveFacetTest', async function () {
     await reserveFacet.connect(subscriberAddress).cancel(paymentId)
     let reservation = await reserveFacet.getReservation(paymentId)
     expect(reservation.status).equal(status.Canceled)
+    expect(await reserveFacet.executionPoint(subscriberAddress.address)).equal(0);
+    expect(await reserveFacet.failurePoint(subscriberAddress.address)).equal(0);
   })
 
   it('withdrawDeposit', async () => {
@@ -102,6 +105,8 @@ describe('ReserveFacetTest', async function () {
     await reserveFacet.connect(merchantAddress).withdrawDeposit(10, 10000, withdrawPaymentId, [])
     reservation = await reserveFacet.getReservation(withdrawPaymentId)
     expect(reservation.status).equal(status.Canceled)
+    expect(await reserveFacet.executionPoint(subscriberAddress.address)).equal(0);
+    expect(await reserveFacet.failurePoint(subscriberAddress.address)).equal(1);
     await ethers.provider.send("evm_increaseTime", [-withdrawableTime]);
     await ethers.provider.send("evm_mine", []);
   })
@@ -121,5 +126,7 @@ describe('ReserveFacetTest', async function () {
     reservation = await reserveFacet.getReservation(settlePaymentId)
     expect(reservation.additionalAmount).equal(additionalAmount)
     expect(reservation.status).equal(status.Settled)
+    expect(await reserveFacet.executionPoint(subscriberAddress.address)).equal(1);
+    expect(await reserveFacet.failurePoint(subscriberAddress.address)).equal(1);
   })
 })
