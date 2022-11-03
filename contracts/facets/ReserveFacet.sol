@@ -4,7 +4,6 @@ pragma solidity ^0.8.17;
 import {LibReserve} from "../libraries/LibApp.sol";
 import {LibMerchant} from "../libraries/LibMerchant.sol";
 import "../libraries/UniversalERC20.sol";
-import "../extension/interfaces/ISlashSubmitTransaction.sol";
 
 interface ISwap {
     function swapTokensForExactTokens(
