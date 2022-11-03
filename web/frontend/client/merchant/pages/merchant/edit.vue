@@ -10,7 +10,7 @@
             </v-toolbar>
             <v-divider></v-divider>
             <v-card-text className="">
-              <shipment-form></shipment-form>
+              <merchant-form></merchant-form>
             </v-card-text>
           </v-card>
         </v-flex>
@@ -21,13 +21,13 @@
 
 <script>
 import VWidget from '@/components/VWidget';
-import ShipmentForm from '@/components/widgets/form/ShipmentForm';
+import MerchantForm from '@/components/widgets/form/MerchantForm';
 
 export default {
   layout: 'dashboard',
   components: {
     VWidget,
-    ShipmentForm,
+    MerchantForm,
   },
   data() {
     return {};

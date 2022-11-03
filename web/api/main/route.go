@@ -30,7 +30,7 @@ func merchantRoute(api *gin.RouterGroup) {
 	merchant := api.Group("/merchant")
 	{
 		merchant.GET("/token/:address", merchantHandler.HandleGetToken)
-		merchant.GET("/auth", merchantHandler.HandleAuth)
+		merchant.POST("/auth", merchantHandler.HandleAuth)
 
 		auth := merchant.Group("")
 		auth.Use(middleware.AuthMiddleware())

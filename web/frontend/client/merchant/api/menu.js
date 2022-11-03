@@ -5,7 +5,7 @@ const Menu = [
     group: 'dashboard',
     icon: 'dashboard',
     name: 'Dashboard',
-    href: '/'
+    href: '/dashboard'
   },
   {header: 'Reservation'},
   {
