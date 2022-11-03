@@ -4,22 +4,11 @@ pragma solidity ^0.8.17;
 import {LibReserve} from "../libraries/LibApp.sol";
 import {LibMerchant} from "../libraries/LibMerchant.sol";
 import "../libraries/UniversalERC20.sol";
-
-interface ISwap {
-    function swapTokensForExactTokens(
-        uint256 amountOut,
-        uint256 amountInMax,
-        address[] calldata path,
-        address to,
-        uint256 deadline
-    ) external returns (uint256[] memory amounts);
-}
+import "../interfaces/IUniswapV2Router02.sol";
 
 contract ReserveFacet {
     using UniversalERC20 for IERC20;
     using SafeMath for uint256;
-
-    event SettleReservation(address to, address token, uint amount);
 
     function getReservation(string memory _paymentId) external view returns (LibReserve.Reserve memory) {
         LibReserve.Reserve storage reserve = LibReserve.reserveStorage().reserve[_paymentId];
@@ -49,8 +38,8 @@ contract ReserveFacet {
         uint256 _amountIn,
         uint256 _requiredAmountOut,
         uint256 _deadline,
-        address[] calldata _path,
-        string memory _paymentId
+        string memory _paymentId,
+        address[] calldata _path
     ) external {
         LibReserve.isSubscriber(_paymentId);
         LibReserve.isStatusReserved(_paymentId);
@@ -63,7 +52,7 @@ contract ReserveFacet {
         IERC20(reserve.token).universalTransferFrom(msg.sender, address(this), amount);
 
         IERC20(reserve.token).approve(reserveStorage.swapSubmitAddress, _amountIn);
-        ISwap(reserveStorage.swapSubmitAddress).swapTokensForExactTokens(
+        IUniswapV2Router02(reserveStorage.swapSubmitAddress).swapTokensForExactTokens(
             _requiredAmountOut,
             _amountIn,
             _path,
@@ -90,16 +79,22 @@ contract ReserveFacet {
         );
     }
 
-    function withdrawDeposit(string memory _paymentId) external {
+    function withdrawDeposit(
+        uint256 _amountOut,
+        uint256 _deadline,
+        string memory _paymentId,
+        address[] calldata _path
+    ) external {
+        LibReserve.isMerchant(_paymentId);
         LibReserve.isWithdrawDeposit(_paymentId);
-
+        LibReserve.ReserveStorage storage reserveStorage = LibReserve.reserveStorage();
         LibReserve.Reserve storage reserve = LibReserve.reserveStorage().reserve[_paymentId];
         reserve.status = LibReserve.Status.Canceled;
 
         IERC20(reserve.token).approve(reserveStorage.swapSubmitAddress, reserve.depositAmount);
-        ISwap(reserveStorage.swapSubmitAddress).swapTokensForExactTokens(
-            _requiredAmountOut,
-            _amountIn,
+        IUniswapV2Router02(reserveStorage.swapSubmitAddress).swapExactTokensForTokens(
+            reserve.depositAmount,
+            _amountOut,
             _path,
             reserve.merchant,
             _deadline

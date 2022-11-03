@@ -65,15 +65,6 @@ async function deployDiamond () {
   return diamond.address
 }
 
-async function deployReceivePayment () {
-  // deploy ReceivePaymentContract
-  const ReceivePayment = await ethers.getContractFactory('ReceivePayment')
-  const receivePayment = await ReceivePayment.deploy()
-  await receivePayment.deployed()
-  console.log('ReceivePayment deployed:', receivePayment.address)
-  return receivePayment.address
-}
-
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 if (require.main === module) {
@@ -83,14 +74,6 @@ if (require.main === module) {
       console.error(error)
       process.exit(1)
     })
-
-  deployReceivePayment()
-    .then(() => process.exit(0))
-    .catch(error => {
-      console.error(error)
-      process.exit(1)
-    })
 }
 
 exports.deployDiamond = deployDiamond
-exports.deployReceivePayment = deployReceivePayment
