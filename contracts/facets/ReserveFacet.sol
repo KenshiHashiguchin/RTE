@@ -3,8 +3,10 @@ pragma solidity ^0.8.17;
 
 import {LibReserve} from "../libraries/LibApp.sol";
 import {LibExp} from "../libraries/LibExp.sol";
+import {LibToken} from "../libraries/LibToken.sol";
 import "../libraries/UniversalERC20.sol";
 import "../interfaces/IUniswapV2Router02.sol";
+import "../interfaces/IUtilityToken.sol";
 
 contract ReserveFacet {
     using UniversalERC20 for IERC20;
@@ -65,6 +67,9 @@ contract ReserveFacet {
 
         LibExp.ExpStorage storage expStorage = LibExp.expStorage();
         expStorage.executionPoint[msg.sender]++;
+
+        LibToken.TokenStorage storage tokenStorage = LibToken.tokenStorage();
+        IUtilityToken(tokenStorage.utilityToken).mint(reserve.subscriber, tokenStorage.mintAmount);
     }
 
     function cancel(string memory _paymentId) external {
@@ -125,6 +130,26 @@ contract ReserveFacet {
         require(account != address(0), "Zero address has no balance.");
         LibExp.ExpStorage storage expStorage = LibExp.expStorage();
         return expStorage.executionPoint[account];
+    }
+
+    function changeMintAmount(uint256 amount) external {
+        LibReserve.isContractOwner();
+        LibToken.TokenStorage storage tokenStorage = LibToken.tokenStorage();
+        tokenStorage.mintAmount = amount;
+    }
+
+    function mintAmount() external view returns (uint256) {
+        return LibToken.tokenStorage().mintAmount;
+    }
+
+    function transferUtilityTokenAddress(address tokenAddress) external {
+        LibReserve.isContractOwner();
+        LibToken.TokenStorage storage tokenStorage = LibToken.tokenStorage();
+        tokenStorage.utilityToken = tokenAddress;
+    }
+
+    function utilityTokenAddress() external view returns (address) {
+        return LibToken.tokenStorage().utilityToken;
     }
 
 }

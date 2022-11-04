@@ -1,9 +1,11 @@
 /* global describe it before ethers */
 
 const {deployDiamond} = require('../scripts/deploy.js')
+const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 
 const {expect} = require('chai')
 const {waffle, ethers} = require('hardhat');
+const UtilityTokenContract = require("../artifacts/contracts/interfaces/IUtilityToken.sol/IUtilityToken.json");
 const {deployMockContract, provider} = waffle;
 
 describe('ReserveFacetTest', async function () {
@@ -26,6 +28,7 @@ describe('ReserveFacetTest', async function () {
   let status = {None: 0, Reserved: 1, Canceled: 2, Settled: 3};
   let now = parseInt(Date.now() / 1000)
   let mockedRouterContract
+  let mockedUtilityTokenContract
 
   before(async function () {
     [owner, swapAddress, subscriberAddress, merchantAddress, token, ...addrs] = await ethers.getSigners()
@@ -36,7 +39,7 @@ describe('ReserveFacetTest', async function () {
     reserveFacet = await ethers.getContractAt('ReserveFacet', diamondAddress)
 
     // interface
-    const [deployerOfERC20Contract, deployerOfRouterContract] = provider.getWallets();
+    const [deployerOfERC20Contract, deployerOfRouterContract, deployerOfUtilityTokenContract] = provider.getWallets();
     // deploy the contract to Mock
     const ERC20Contract = require('../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json');
     mockedERC20Contract = await deployMockContract(deployerOfERC20Contract, ERC20Contract.abi);
@@ -112,6 +115,19 @@ describe('ReserveFacetTest', async function () {
   })
 
   it('settleReservation', async () => {
+    // setup
+    const [deployerOfUtilityTokenContract, transferUtilityTokenAddress] = provider.getWallets();
+
+
+    const UtilityTokenContract = require('../artifacts/contracts/interfaces/IUtilityToken.sol/IUtilityToken.json');
+    mockedUtilityTokenContract = await deployMockContract(transferUtilityTokenAddress, UtilityTokenContract.abi);
+    await reserveFacet.transferUtilityTokenAddress(mockedUtilityTokenContract.address)
+    await reserveFacet.changeMintAmount(20)
+    await mockedUtilityTokenContract.mock.mint.returns(true);
+
+    expect(await reserveFacet.utilityTokenAddress()).equal(mockedUtilityTokenContract.address)
+    expect(await reserveFacet.mintAmount()).equal(20)
+
     // already canceled
     await expect(reserveFacet.connect(subscriberAddress).settleReservation(5, 5, 10000, paymentId, [])).revertedWith("This transaction has been closed")
 
