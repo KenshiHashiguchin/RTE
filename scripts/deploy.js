@@ -28,7 +28,6 @@ async function deployDiamond () {
   console.log('DiamondInit deployed:', diamondInit.address)
 
   // deploy facets
-  console.log('')
   console.log('Deploying facets')
   const FacetNames = [
     'DiamondLoupeFacet',

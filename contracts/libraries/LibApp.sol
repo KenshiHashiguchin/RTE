@@ -67,7 +67,6 @@ library LibReserve {
 
     function isWithdrawDeposit(string memory _paymentId) internal view {
         isStatusReserved(_paymentId);
-        isMerchant(_paymentId);
         require(block.timestamp > reserveStorage().reserve[_paymentId].withdrawableTime, "Still can't pull it out");
     }
 

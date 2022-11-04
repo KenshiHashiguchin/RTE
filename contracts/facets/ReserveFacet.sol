@@ -2,9 +2,11 @@
 pragma solidity ^0.8.17;
 
 import {LibReserve} from "../libraries/LibApp.sol";
-import {LibMerchant} from "../libraries/LibMerchant.sol";
+import {LibExp} from "../libraries/LibExp.sol";
+import {LibToken} from "../libraries/LibToken.sol";
 import "../libraries/UniversalERC20.sol";
-import "../extension/interfaces/ISlashSubmitTransaction.sol";
+import "../interfaces/IUniswapV2Router02.sol";
+import "../interfaces/IUtilityToken.sol";
 
 contract ReserveFacet {
     using UniversalERC20 for IERC20;
@@ -30,39 +32,44 @@ contract ReserveFacet {
         reserve.status = LibReserve.Status.Reserved;
 
         if (_depositAmount > 0) {
-            IERC20(_token).universalTransfer(
-                address(this),
-                _depositAmount
-            );
+            IERC20(_token).universalTransferFrom(msg.sender, address(this), _depositAmount);
         }
     }
 
     function settleReservation(
-        address payingToken_,
-        uint256 amountIn_,
-        uint256 requiredAmountOut_,
-        address[] memory path_,
-        address[] memory feePath_,
-        string memory paymentId_,
-        string memory optional_
+        uint256 _amountIn,
+        uint256 _requiredAmountOut,
+        uint256 _deadline,
+        string memory _paymentId,
+        address[] calldata _path
     ) external {
-        LibReserve.isSubscriber(paymentId_);
-        LibReserve.isStatusReserved(paymentId_);
+        LibReserve.isSubscriber(_paymentId);
+        LibReserve.isStatusReserved(_paymentId);
 
         LibReserve.ReserveStorage storage reserveStorage = LibReserve.reserveStorage();
-        LibReserve.Reserve storage reserve = reserveStorage.reserve[paymentId_];
-        require(amountIn_ >= reserve.depositAmount, "Excess payments");
+        LibReserve.Reserve storage reserve = reserveStorage.reserve[_paymentId];
+        require(_amountIn >= reserve.depositAmount, "Excess payments");
 
-        uint256 amount = amountIn_.sub(reserve.depositAmount);
-        IERC20(payingToken_).universalTransfer(address(this), amount);
+        uint256 amount = _amountIn.sub(reserve.depositAmount);
+        IERC20(reserve.token).universalTransferFrom(msg.sender, address(this), amount);
 
-        IERC20(reserve.token).approve(reserveStorage.swapSubmitAddress, amountIn_);
-        ISlashSubmitTransaction(reserveStorage.swapSubmitAddress).submitTransaction(payingToken_, amountIn_, requiredAmountOut_, path_, feePath_, paymentId_, optional_, bytes(""));
+        IERC20(reserve.token).approve(reserveStorage.swapSubmitAddress, _amountIn);
+        IUniswapV2Router02(reserveStorage.swapSubmitAddress).swapTokensForExactTokens(
+            _requiredAmountOut,
+            _amountIn,
+            _path,
+            reserve.merchant,
+            _deadline
+        );
 
         reserve.status = LibReserve.Status.Settled;
         reserve.additionalAmount = amount;
 
-        // TODO SBT
+        LibExp.ExpStorage storage expStorage = LibExp.expStorage();
+        expStorage.executionPoint[msg.sender]++;
+
+        LibToken.TokenStorage storage tokenStorage = LibToken.tokenStorage();
+        IUtilityToken(tokenStorage.utilityToken).mint(reserve.subscriber, tokenStorage.mintAmount);
     }
 
     function cancel(string memory _paymentId) external {
@@ -72,24 +79,35 @@ contract ReserveFacet {
         LibReserve.Reserve storage reserve = LibReserve.reserveStorage().reserve[_paymentId];
         reserve.status = LibReserve.Status.Canceled;
 
-        IERC20(reserve.token).universalTransferFrom(
-            address(this),
+        IERC20(reserve.token).universalTransfer(
             reserve.subscriber,
             reserve.depositAmount
         );
     }
 
-    function withdrawDeposit(string memory _paymentId) external {
+    function withdrawDeposit(
+        uint256 _amountOut,
+        uint256 _deadline,
+        string memory _paymentId,
+        address[] calldata _path
+    ) external {
+        LibReserve.isMerchant(_paymentId);
         LibReserve.isWithdrawDeposit(_paymentId);
-
+        LibReserve.ReserveStorage storage reserveStorage = LibReserve.reserveStorage();
         LibReserve.Reserve storage reserve = LibReserve.reserveStorage().reserve[_paymentId];
         reserve.status = LibReserve.Status.Canceled;
 
-        IERC20(reserve.token).universalTransferFrom(
-            address(this),
-            reserve.subscriber,
-            reserve.depositAmount
+        IERC20(reserve.token).approve(reserveStorage.swapSubmitAddress, reserve.depositAmount);
+        IUniswapV2Router02(reserveStorage.swapSubmitAddress).swapExactTokensForTokens(
+            reserve.depositAmount,
+            _amountOut,
+            _path,
+            reserve.merchant,
+            _deadline
         );
+
+        LibExp.ExpStorage storage expStorage = LibExp.expStorage();
+        expStorage.failurePoint[reserve.subscriber]++;
     }
 
     function transferSwapSubmitAddress(address _newAddress) external {
@@ -100,6 +118,38 @@ contract ReserveFacet {
 
     function swapSubmitAddress() external view returns (address) {
         return LibReserve.reserveStorage().swapSubmitAddress;
+    }
+
+    function failurePoint(address account) external view returns (uint256) {
+        require(account != address(0), "Zero address has no balance.");
+        LibExp.ExpStorage storage expStorage = LibExp.expStorage();
+        return expStorage.failurePoint[account];
+    }
+
+    function executionPoint(address account) external view returns (uint256) {
+        require(account != address(0), "Zero address has no balance.");
+        LibExp.ExpStorage storage expStorage = LibExp.expStorage();
+        return expStorage.executionPoint[account];
+    }
+
+    function changeMintAmount(uint256 amount) external {
+        LibReserve.isContractOwner();
+        LibToken.TokenStorage storage tokenStorage = LibToken.tokenStorage();
+        tokenStorage.mintAmount = amount;
+    }
+
+    function mintAmount() external view returns (uint256) {
+        return LibToken.tokenStorage().mintAmount;
+    }
+
+    function transferUtilityTokenAddress(address tokenAddress) external {
+        LibReserve.isContractOwner();
+        LibToken.TokenStorage storage tokenStorage = LibToken.tokenStorage();
+        tokenStorage.utilityToken = tokenAddress;
+    }
+
+    function utilityTokenAddress() external view returns (address) {
+        return LibToken.tokenStorage().utilityToken;
     }
 
 }
