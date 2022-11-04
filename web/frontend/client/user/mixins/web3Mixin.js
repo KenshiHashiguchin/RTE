@@ -1,5 +1,9 @@
 import Web3 from "web3";
-import abi from "~/constants/abi.json";
+import trustReserveAbi from "~/constants/trust_reserve_abi.json";
+import daiAbi from "~/constants/dai_abi.json";
+import wethAbi from "~/constants/weth_abi.json";
+import usdtAbi from "~/constants/usdt_abi.json";
+import wmaticAbi from "~/constants/wmatic_abi.json";
 import contractAddresses from "~/constants/contractAddresses.json";
 import {mapGetters, mapMutations} from "vuex";
 
@@ -35,8 +39,26 @@ export default {
         throw new Error("No web3 provider detected.\nDid you install the Metamask extension on this browser?")
       }
     },
-    async getContract(web3Instance) {
+    async getContract(web3Instance, contract = 'trustReserve') {
       console.log(contractAddresses)
+      let abi = ''
+      switch (contract) {
+        case 'DAI':
+          abi = daiAbi
+          break
+        case 'WETH':
+          abi = wethAbi
+          break
+        case 'USDT':
+          abi = usdtAbi
+          break
+        case 'WMATIC':
+          abi = wmaticAbi
+          break
+        default:
+          abi = trustReserveAbi
+          break
+      }
       return new web3Instance.eth.Contract(
         abi,
         contractAddresses.address
