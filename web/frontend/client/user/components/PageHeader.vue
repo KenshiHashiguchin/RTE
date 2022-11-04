@@ -10,20 +10,12 @@
 
 <script>
 import {mapState} from "vuex";
+import web3Mixin from "~~/client/user/mixins/web3Mixin";
 
 export default {
   computed: {
     ...mapState('web3', ['isListening'])
   },
-  methods: {
-    connect() {
-      // todo
-      // call common func
-    },
-    disconnect() {
-      // todo
-      //  remove cookie
-    }
-  }
+  mixins: [web3Mixin],
 };
 </script>

@@ -33,14 +33,15 @@
 </template>
 
 <script>
-import Web3 from 'web3'
 import {mapGetters, mapMutations} from 'vuex';
-import Metamask from "~~/client/merchant/components/Metamask";
-import Dialog from "~~/client/user/components/common/Dialog";
+import Metamask from "~/components/Metamask";
+import Dialog from "~/components/common/Dialog";
+import web3Mixin from "~/mixins/web3Mixin";
 
 export default {
   components: {Dialog, Metamask},
   layout: 'default',
+  mixins: [web3Mixin],
   data() {
     return {
       errorMessage: '',
@@ -67,64 +68,17 @@ export default {
         this.errorMessage = e.message
       }
     },
-    async connect() {
-      // Check for web3 provider
-      if (typeof window.ethereum !== 'undefined') {
-        try {
-          // Ask to connect
-          await window.ethereum.request({method: 'eth_requestAccounts'})
-          const instance = new Web3(window.ethereum)
-          const networkId = await instance.eth.net.getId();
-          const coinbase = await instance.eth.getCoinbase();
-          const balance = await instance.eth.getBalance(coinbase);
-          this.registerWeb3Instance({
-            networkId,
-            coinbase,
-            balance
-          });
-
-          this.errorMessage = '';
-        } catch (error) {
-          throw new Error('Please connect to your Ethereum address on Metamask before connecting to this website')
-        }
-      }
-      // No web3 provider
-      else {
-        throw new Error("No web3 provider detected.\nDid you install the Metamask extension on this browser?")
-      }
-    },
     async getToken() {
-      console.log('--getToken Start--')
       let token = null
       try {
         const {data} = await this.$axios.get(`/api/token/${this.web3.coinbase}`)
         console.log(data)
         token = data.token
       } catch (e) {
-        // todo
-        this.error = e
+        this.errorMessage = e.message
       }
-      console.log('--getToken End--')
       return token
     },
-    async signature(token) {
-      console.log('--signature Start--')
-      const message = `Signature for login authentication(token:${token})`
-      try {
-        // sign
-        const instance = new Web3(window.ethereum)
-        let signature = await instance.eth.personal.sign(message, this.web3.coinbase);
-
-        // req
-        await this.$axios.post('/api/auth', {
-          address: this.web3.coinbase,
-          signature: signature,
-        })
-      } catch (e) {
-        this.errorMessage = ''
-      }
-      console.log('--signature End--')
-    }
   }
 }
 </script>

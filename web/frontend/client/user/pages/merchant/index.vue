@@ -7,62 +7,12 @@
         <h1>Merchant</h1>
         <v-layout>
           <v-flex text-xs-center>
-            <v-row dense>
-              <v-col
-                v-for="(merchant,i) in merchants"
-                :key="`merchant-card-${i}`"
-                :cols="4"
-              >
-                <v-card
-                  max-width="375"
-                  class="mx-auto"
-                  @click="goToDetail(merchant)">
-                  <v-list>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>merchant.name : {{ merchant.name }}</v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>merchant.address : {{ merchant.address }}</v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>merchant.received_address : {{
-                            merchant.received_address
-                          }}
-                        </v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>merchant.merchant_address : {{
-                            merchant.merchant_address
-                          }}
-                        </v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>merchant.tel : {{ merchant.tel }}</v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>merchant.deposit : {{ merchant.deposit }}</v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>merchant.cancelable_time : {{ merchant.cancelable_time }}</v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                </v-card>
-              </v-col>
-            </v-row>
+            <MerchantTable
+              :merchants="merchants"
+              @reserve="reserve"
+              @go-to-detail="goToDetail"
+            >
+            </MerchantTable>
           </v-flex>
         </v-layout>
       </v-container>
@@ -79,7 +29,10 @@ export default {
     let merchants = []
     try {
       const {data} = await app.$axios.get('/api/merchants')
-      merchants = data.merchants ? data.merchants : []
+      merchants = data.merchants ? data.merchants.map(v => {
+        v.cancelable_days = `before ${Math.floor(v.cancelable_time / 60 / 60)} days`
+        return v
+      }) : []
     } catch (e) {
       console.log(e)
     }
@@ -88,11 +41,13 @@ export default {
     }
   },
   methods: {
+    reserve(merchant) {
+      console.log(merchant)
+    },
     goToDetail(merchant) {
-      console.log('goToDetail')
-      console.log(merchant.address)
       this.$router.push(`/merchant/${merchant.address}/show`)
-    }
+    },
+
   }
 }
 </script>

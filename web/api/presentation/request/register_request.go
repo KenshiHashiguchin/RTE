@@ -7,7 +7,7 @@ import (
 type Register struct {
 	ReceivedAddress string `json:"received_address" validate:"required"`
 	Name            string `json:"name" validate:"required,max=30"`
-	Tel             string `json:"tel" validate:"required,max=12"`
+	Tel             string `json:"tel" validate:"required,max=20"`
 	MerchantAddress string `json:"merchant_address" validate:"required"`
 	Deposit         uint   `json:"deposit" validate:"required,min=0"`
 	CancelableTime  uint   `json:"cancelable_time" validate:"required,min=0"`
@@ -34,7 +34,7 @@ func (r *Register) Validate() (ok bool, error map[string]string) {
 			case "Tel":
 				switch errors[i].Tag() {
 				case "max":
-					result["ReceivedAddress"] = "20字以内で入力してください。"
+					result["Tel"] = "20字以内で入力してください。"
 				}
 			case "Deposit":
 				switch errors[i].Tag() {

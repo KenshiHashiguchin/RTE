@@ -1,35 +1,60 @@
 <template>
-  <div>
-    <h1>
-      API&CONTRACT TEST
-    </h1>
-    <div>
-      <h2>CONTRACT</h2>
-      <v-text-field label="paymentId(string)" v-model="paymentId"/>
-      <v-btn @click="getContract">getReservation</v-btn>
-      <v-divider></v-divider>
-      <h2>API</h2>
-      <v-btn @click="getToken">getToken</v-btn>
-      <v-btn @click="signature">signature</v-btn>
-      <v-btn @click="merchants">merchants</v-btn>
-      <v-btn @click="merchant">merchant</v-btn>
-      <v-btn @click="reserve">reserve</v-btn>
-      <v-btn @click="reserves">reserves</v-btn>
-    </div>
-  </div>
+  <v-main>
+    <v-container fluid>
+      <h1>
+        API&CONTRACT TEST
+      </h1>
+      <div class="mx-auto">
+        <h2>CONTRACT</h2>
+        <v-text-field label="paymentId(string)" v-model="paymentId"/>
+        <div v-if="reservation">
+          <p>additionalAmount : {{ reservation.additionalAmount }}</p>
+          <p>cancelableTime : {{ reservation.cancelableTime }}</p>
+          <p>depositAmount : {{ reservation.depositAmount }}</p>
+          <p>merchant : {{ reservation.merchant }}</p>
+          <p>status : {{ reservation.status }}</p>
+          <p>subscriber : {{ reservation.subscriber }}</p>
+          <p>token : {{ reservation.token }}</p>
+          <p>withdrawableTime : {{ reservation.withdrawableTime }}</p>
+        </div>
+        <v-btn @click="getReservation">getReservation</v-btn>
+        <v-divider class="my-2"></v-divider>
+        <h2>API</h2>
+        <v-btn @click="getToken">getToken</v-btn>
+        <v-btn @click="signature">signature</v-btn>
+        <v-btn @click="merchants">merchants</v-btn>
+        <v-btn @click="merchant">merchant</v-btn>
+        <v-btn @click="reserve">reserve</v-btn>
+        <v-btn @click="reserves">reserves</v-btn>
+      </div>
+    </v-container>
+  </v-main>
 </template>
 
 <script>
+import Web3 from "web3";
+import web3Mixin from "@/mixins/web3Mixin";
+
 export default {
   name: "TestIndex",
+  mixins: [web3Mixin],
   data() {
     return {
-      paymentId: 'test'
+      paymentId: 'test',
+      reservation: null,
     }
   },
   methods: {
-    async getContract(){
-
+    async getReservation() {
+      try {
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const contract = await this.getContract(instance)
+        const res = await contract.methods.getReservation(this.paymentId).call()
+        console.log(res)
+        this.reservation = res
+      } catch (error) {
+        console.log(error)
+      }
     },
     /**
      * 署名用トークンを取得
@@ -141,7 +166,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>
