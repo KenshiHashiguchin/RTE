@@ -164,29 +164,6 @@
         "inputs": [
             {
                 "internalType": "string",
-                "name": "paymentId",
-                "type": "string"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "approve",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
                 "name": "_paymentId",
                 "type": "string"
             }
@@ -299,105 +276,66 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "amountIn_",
+                "name": "_amountIn",
                 "type": "uint256"
             },
             {
                 "internalType": "uint256",
-                "name": "requiredAmountOut_",
+                "name": "_requiredAmountOut",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_deadline",
                 "type": "uint256"
             },
             {
                 "internalType": "address[]",
-                "name": "path_",
-                "type": "address[]"
-            },
-            {
-                "internalType": "address[]",
-                "name": "feePath_",
+                "name": "_path",
                 "type": "address[]"
             },
             {
                 "internalType": "string",
-                "name": "paymentId_",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "optional_",
+                "name": "_paymentId",
                 "type": "string"
             }
         ],
         "name": "settleReservation",
         "outputs": [],
-        "stateMutability": "payable",
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "payingToken_",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
-                "name": "amountIn_",
+                "name": "_amountIn",
                 "type": "uint256"
             },
             {
                 "internalType": "uint256",
-                "name": "requiredAmountOut_",
+                "name": "_requiredAmountOut",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_deadline",
                 "type": "uint256"
             },
             {
                 "internalType": "address[]",
-                "name": "path_",
-                "type": "address[]"
-            },
-            {
-                "internalType": "address[]",
-                "name": "feePath_",
+                "name": "_path",
                 "type": "address[]"
             },
             {
                 "internalType": "string",
-                "name": "paymentId_",
+                "name": "_paymentId",
                 "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "optional_",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes",
-                "name": "reserved_",
-                "type": "bytes"
             }
         ],
-        "name": "submitTransaction",
-        "outputs": [
-            {
-                "internalType": "bytes16",
-                "name": "txNumber",
-                "type": "bytes16"
-            }
-        ],
+        "name": "settleReservationDbg",
+        "outputs": [],
         "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "swapApproveAddress",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
