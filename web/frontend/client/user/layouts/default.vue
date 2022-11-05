@@ -10,6 +10,7 @@
 import Web3 from "web3";
 
 export default {
+  name: 'defaultLayout',
   async mounted() {
     if (typeof window.ethereum !== 'undefined') {
       let currentAccount = null

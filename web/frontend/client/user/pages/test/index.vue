@@ -35,6 +35,18 @@
           <v-text-field label="_paymentId(string)" v-model="paymentId_3"/>
           <v-btn @click="cancel">cancel</v-btn>
         </div>
+        <div class="mb-2">
+          <h3>approve</h3>
+          <v-select
+            :items="receivedAddressLists"
+            v-model="received_token"
+            label="Token"
+            item-text="name"
+            item-value="name"
+          ></v-select>
+          <v-text-field label="_value(string)" v-model="amount"/>
+          <v-btn @click="approve">approve</v-btn>
+        </div>
         <v-divider class="my-2"></v-divider>
         <h2>API</h2>
         <v-btn @click="getToken">getToken</v-btn>
@@ -51,6 +63,8 @@
 <script>
 import Web3 from "web3";
 import web3Mixin from "@/mixins/web3Mixin";
+import tokenContactAddresses from "~/constants/tokenContactAddresses";
+import trustReserveContractAddress from "~~/client/user/constants/trustReserveContractAddress.json";
 
 export default {
   name: "TestIndex",
@@ -65,9 +79,38 @@ export default {
       paymentId_2: 'test',
       paymentId_3: 'test',
       reservation: null,
+      received_token: 'WMATIC',
+      amount: 1,
     }
   },
+  computed: {
+    receivedAddressLists() {
+      return tokenContactAddresses.TOKEN_CONTRACT_ADDRESSES
+    },
+  },
   methods: {
+    async approve() {
+      try {
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const accounts = await instance.eth.getAccounts()
+        const account = accounts[0]
+        const coinbase = await instance.eth.getCoinbase();
+        const contract = await this.getContract(instance, this.received_token)
+        const contractAddress = trustReserveContractAddress.address
+
+        const res = await contract.methods.approve(contractAddress, this.amount)
+          .send({from: account}).on('receipt', (receipt) => {
+            contract.methods.transferFrom(coinbase, contractAddress, this.amount)
+              .send({from: account}).on('receipt', (receipt) => {
+              // do something with receipt object
+            })
+          })
+        console.log(res)
+        this.reservation = res
+      } catch (error) {
+        console.log(error)
+      }
+    },
     async getReservation() {
       try {
         const instance = this.createWeb3Instance(Web3.givenProvider)
