@@ -44,10 +44,9 @@ export default {
     reserve(merchant) {
       console.log(merchant)
     },
-    goToDetail(merchant) {
-      this.$router.push(`/merchant/${merchant.address}/show`)
-    },
-
+    // goToDetail(merchant) {
+    //   this.$router.push(`/merchant/${merchant.address}/show`)
+    // },
   }
 }
 </script>

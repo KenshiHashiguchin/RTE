@@ -9,7 +9,9 @@
   >
     <template v-slot:item.actions="{ item }">
       <v-btn x-small @click="reserve(item)">Reserve</v-btn>
-      <v-btn x-small @click="goToDetail(item)">Detail</v-btn>
+      <a :href="`/merchant/${item.address}/show`" target="_blank">
+        <v-btn x-small type="button">Detail</v-btn>
+      </a>
     </template>
   </v-data-table>
 </template>
@@ -82,9 +84,9 @@ export default {
     reserve(item) {
       this.$emit('reserve', item)
     },
-    goToDetail(item) {
-      this.$emit('go-to-detail', item)
-    }
+    // goToDetail(item) {
+    //   this.$emit('go-to-detail', item)
+    // }
   }
 }
 </script>

@@ -1,6 +1,10 @@
 body {
   background: #17181c;
+  &.page-shop-sample {
+    background: #fff !important;
+  }
 }
+
 
 .card-gradient {
   box-shadow: -20px 20px 70px rgb(128 222 234 / 70%), 20px -20px 70px rgb(62 185 252 / 70%) !important;
