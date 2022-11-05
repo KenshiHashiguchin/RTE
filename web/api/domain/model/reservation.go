@@ -13,9 +13,10 @@ type Reservation struct {
 	firstname       string
 	tel             string
 	number          uint
+	merchant        Merchant
 }
 
-func NewReservation(paymentId string, merchantId uint, reservedAddress, surname, firstname, tel string, number uint) Reservation {
+func NewReservation(paymentId string, merchantId uint, reservedAddress, surname, firstname, tel string, number uint, merchant Merchant) Reservation {
 	return Reservation{
 		paymentId,
 		merchantId,
@@ -24,6 +25,7 @@ func NewReservation(paymentId string, merchantId uint, reservedAddress, surname,
 		firstname,
 		tel,
 		number,
+		merchant,
 	}
 }
 
@@ -53,6 +55,10 @@ func (r Reservation) GetTel() string {
 
 func (r Reservation) GetNumber() uint {
 	return r.number
+}
+
+func (r Reservation) GetMerchant() Merchant {
+	return r.merchant
 }
 
 func GeneratePaymentId() (string, error) {
