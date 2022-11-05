@@ -8,6 +8,12 @@ export const state = () => ({
 })
 
 export const mutations = {
+  init(state) {
+    state.isListening = false
+    state.web3.networkId = null
+    state.web3.coinbase = null
+    state.web3.balance = null
+  },
   registerWeb3Instance (state, payload) {
     console.log('registerWeb3instance Mutation being executed', payload)
     let result = payload

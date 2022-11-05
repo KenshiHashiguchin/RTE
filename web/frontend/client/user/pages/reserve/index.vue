@@ -7,54 +7,19 @@
         <h1>Reservations</h1>
         <v-layout>
           <v-flex text-xs-center>
-            <v-row dense>
-              <v-col v-for="(reservation, i) in reservations"
-                     :cols="12" :key="`reservation-list-item-${i}`">
-                <v-list one-line>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        <v-chip
-                          class="ma-2"
-                          label
-                          color="cyan"
-                          text-color="white"
-                        >
-                          Status
-                        </v-chip>
-                        {{ status }}
-                      </v-list-item-title>
-                      <v-divider></v-divider>
-                      <!-- todo merchant name-->
-                      <v-list-item-title>
-                        <v-chip
-                          class="ma-2"
-                          label
-                          text-color="white"
-                        >
-                          Merchant Id
-                        </v-chip>
-                        {{ reservation.merchant_id }}
-                      </v-list-item-title>
-                      <v-list-item-title>
-                        <v-chip
-                          class="ma-2"
-                          label
-                          text-color="white"
-                        >
-                          Number of Visitors
-                        </v-chip>
-                        {{ reservation.number }}
-                      </v-list-item-title>
-                      <!--{{ reservation.surname }}-->
-                      <!--{{ reservation.first_name }}-->
-                      <!--{{ reservation.phonenumber }}-->
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-list>
-              </v-col>
-            </v-row>
+            <ReserveTable :reserves="reservations"
+                          @settlement="activeSettleModal"
+                          @cancel="activeCancelModal"
+            >
+            </ReserveTable>
           </v-flex>
+          <SettlementModal :active="isActiveSettleModal"
+                           @close="isActiveSettleModal = false"
+          ></SettlementModal>
+          <CancelDialog :active="isActiveCancelModal"
+                  :message="cancelMsg"
+                  @close="isActiveCancelModal = false"
+          ></CancelDialog>
         </v-layout>
       </v-container>
     </v-main>
@@ -63,15 +28,32 @@
 
 <script>
 import Breadcrumbs from "~/components/common/Breadcrumbs";
+import Web3 from "web3";
+import web3Mixin from "~~/client/user/mixins/web3Mixin";
+import CancelDialog from "~/components/common/CancelDialog";
 
 export default {
   name: "ReserveIndex",
-  components: {Breadcrumbs},
+  mixins: [web3Mixin],
+  data() {
+    return {
+      reservations: [],
+      isActiveSettleModal: false,
+      isActiveCancelModal: false,
+    }
+  },
+  components: {CancelDialog, Breadcrumbs},
   async asyncData({app, error}) {
     let reservations = []
     try {
       const {data} = await app.$axios.get('/api/reserve_list')
-      reservations = data.reservations ? data.reservations : []
+      reservations = data.reservations ? data.reservations.map(v => {
+        v.status = 'Loading'
+        if(v.merchant){
+          v.merchant.cancelable_days = `before ${Math.floor(v.merchant.cancelable_time / 60 / 60)} days`
+        }
+        return  v
+      }) : []
     } catch (e) {
       error({
         statusCode: e.response.status,
@@ -83,12 +65,64 @@ export default {
     }
   },
   computed: {
-    status() {
-      const statuses = ['None',
-      'Reserved',
-      'Canceled',
-      'Settled']
+    statues() {
+      const statuses = [
+        'None',
+        'Reserved',
+        'Canceled',
+        'Settled',
+        'Loading', // front用
+      ]
       return statuses[Math.floor(Math.random() * statuses.length)]
+    },
+    cancelMsg() {
+      return 'Can I really cancel this reservation?'
+    }
+  },
+  mounted() {
+    this.reservations.forEach(v => {
+      this.getReservationContract(v)
+    })
+  },
+  methods: {
+    async getReservationContract(item) {
+      try {
+        const paymentId = item.payment_id
+        console.log('item.id')
+        console.log(item.id)
+        const targetReservation = this.reservations.find(v => v.id = paymentId)
+
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        console.log(instance)
+        const contract = await this.getContract(instance, 'trustReserve')
+        console.log(contract)
+        const res = await contract.methods.getReservation(paymentId).call()
+        if(res) {
+          targetReservation.status = res.status
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async cancel(item){
+      try {
+        const paymentId = item.payment_id
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const accounts = await instance.eth.getAccounts()
+        const account = accounts[0]
+        const contract = await this.getContract(instance)
+        const res = await contract.methods.cancel(paymentId).send({from: account})
+
+        console.log(res)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    activeSettleModal() {
+      this.isActiveSettleModal = true
+    },
+    activeCancelModal() {
+      this.isActiveCancelModal = true
     }
   }
 }

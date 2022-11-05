@@ -14,10 +14,15 @@ export default new Vuetify({
       //   secondary: colors.cyan.lighten2, // #4DD0E1
       //   accent: colors.yellow.darken1, // #FDD835
       // },
+      /**
+       * @see colors.png
+       */
       dark: {
-        primary: colors.cyan, // #00BCD4
-        secondary: colors.cyan.lighten2, // #4DD0E1
-        accent: colors.yellow.darken1, // #FDD835
+        primary: '#87CFFB',
+        secondary: '#4C9EED',
+        accent: '#F2A45F',
+        error: '#F9D6A5',
+        info: '#C09A6C',
       },
     },
   },

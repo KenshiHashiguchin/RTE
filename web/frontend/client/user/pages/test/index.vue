@@ -64,7 +64,7 @@
 import Web3 from "web3";
 import web3Mixin from "@/mixins/web3Mixin";
 import tokenContactAddresses from "~/constants/tokenContactAddresses";
-import trustReserveContractAddress from "~~/client/user/constants/trustReserveContractAddress.json";
+import trustReserveContractAddress from "~/constants/trustReserveContractAddress.json";
 
 export default {
   name: "TestIndex",
@@ -116,6 +116,7 @@ export default {
         const instance = this.createWeb3Instance(Web3.givenProvider)
         const contract = await this.getContract(instance)
         const res = await contract.methods.getReservation(this.paymentId_1).call()
+        console.log('res')
         console.log(res)
         this.reservation = res
       } catch (error) {

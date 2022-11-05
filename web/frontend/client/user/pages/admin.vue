@@ -7,15 +7,8 @@
           <v-flex xs12 sm8 md4 lg4>
             <v-card class="pa-3 card-gradient">
               <v-card-text>
-                <v-row align="center">
-                  <v-col
-                    class="text-h3"
-                    cols="8">Trust<br/>Reserve</v-col>
-                </v-row>
                 <div class="layout column align-center">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Metamask"
-                    width="80" height="80">
+                  <img width="100%" src="/dark-logo.png" alt="trust reserve logo"/>
                 </div>
               </v-card-text>
               <v-card-actions class="connect-wallet">
