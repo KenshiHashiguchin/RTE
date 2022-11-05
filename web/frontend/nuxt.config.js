@@ -13,6 +13,7 @@ export default {
     name: environment,
     userAppUrl: process.env.APP_USER_URL,
     merchantAppUrl: process.env.APP_MERCHANT_URL,
+    infuraUrl: process.env.API_PROVIDER_URL
   },
   srcDir: `client/${appType}/`,
 
