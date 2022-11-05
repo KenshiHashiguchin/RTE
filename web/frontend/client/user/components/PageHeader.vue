@@ -10,7 +10,7 @@
 
 <script>
 import {mapState} from "vuex";
-import web3Mixin from "~~/client/user/mixins/web3Mixin";
+import web3Mixin from "~/mixins/web3Mixin";
 
 export default {
   computed: {

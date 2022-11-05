@@ -1,10 +1,7 @@
 import Web3 from "web3";
 import trustReserveAbi from "~/constants/trust_reserve_abi.json";
-import daiAbi from "~/constants/dai_abi.json";
-import wethAbi from "~/constants/weth_abi.json";
-import usdtAbi from "~/constants/usdt_abi.json";
-import wmaticAbi from "~/constants/wmatic_abi.json";
-import contractAddresses from "~/constants/contractAddresses.json";
+import trustReserveContractAddress from "~/constants/trustReserveContractAddress.json";
+import tokenContactAddresses from "~/constants/tokenContactAddresses";
 import {mapGetters, mapMutations} from "vuex";
 
 export default {
@@ -40,28 +37,27 @@ export default {
       }
     },
     async getContract(web3Instance, contract = 'trustReserve') {
-      console.log(contractAddresses)
-      let abi = ''
+      let abi = null
+      let address =  ''
       switch (contract) {
         case 'DAI':
-          abi = daiAbi
-          break
         case 'WETH':
-          abi = wethAbi
-          break
         case 'USDT':
-          abi = usdtAbi
-          break
         case 'WMATIC':
-          abi = wmaticAbi
+          abi = tokenContactAddresses.getAbi(contract)
+          address = tokenContactAddresses.getAddress(contract)
           break
         default:
           abi = trustReserveAbi
+          address = trustReserveContractAddress.address
           break
+      }
+      if(!abi) {
+        throw new Error('invalid contract name')
       }
       return new web3Instance.eth.Contract(
         abi,
-        contractAddresses.address
+        address
       )
     },
     createWeb3Instance(provider) {
