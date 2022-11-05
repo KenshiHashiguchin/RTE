@@ -86,7 +86,9 @@ export default {
     },
     disconnect() {
       //  remove cookie
-      this.$cookies.remove('user_token')
+      this.$store.commit('web3/init')
+      this.$cookies.remove('user_session')
+      this.$router.push('/')
     }
   }
 }

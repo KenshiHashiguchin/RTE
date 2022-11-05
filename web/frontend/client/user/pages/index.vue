@@ -1,40 +1,42 @@
 <template>
-  <div id="pageIndex">
+  <v-app id="pageIndex">
     <page-header></page-header>
     <v-main>
-      <v-container fill-height class="py-5">
-        <v-card width="400px" class="py-5 px-2 mx-auto mt-5 card-gradient">
-          <v-card-text>
-            <v-row align="center">
-              <v-col
-                class="text-h2"
-                cols="8">Trust<br/>Reserve</v-col>
-            </v-row>
-            <v-row align="center">
-              <v-col>Create public goods that keep power equitable.</v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn block dark rounded color="primary" @click="enter">Enter</v-btn>
-          </v-card-actions>
-        </v-card>
+      <v-container fill-height fluid>
+        <v-layout align-center justify-center>
+          <v-flex xs12 sm8 md4 lg4>
+            <v-card class="pa-3 card-gradient">
+              <v-card-text>
+                <div class="layout column align-center">
+                  <img width="100%" src="/dark-logo.png" alt="trust reserve logo"/>
+                </div>
+                <v-row align="center">
+                  <v-col>Create public goods that keep power equitable.</v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-actions class="connect-wallet">
+                <metamask @connect="login"/>
+              </v-card-actions>
+            </v-card>
+          </v-flex>
+        </v-layout>
       </v-container>
+      <Dialog :active="isErrorDialogActive"
+              :message="errorMessage"
+              @close="isErrorDialogActive = false"></Dialog>
     </v-main>
-  </div>
+  </v-app>
 </template>
 
 <script>
-import PageHeader from '@/components/PageHeader'
+import Metamask from "~/components/Metamask";
+import Dialog from "~/components/common/Dialog";
+import web3Mixin from "~/mixins/web3Mixin";
+import loginMixin from "~/mixins/LoginMixin";
 
 export default {
-  // layouts: 'dashboard',
-  components: {
-    PageHeader,
-  },
-  methods: {
-    enter() {
-      this.$router.push('/admin')
-    }
-  }
-};
+  components: {Dialog, Metamask},
+  layout: 'default',
+  mixins: [web3Mixin, loginMixin],
+}
 </script>

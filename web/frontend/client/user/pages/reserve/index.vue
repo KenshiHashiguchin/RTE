@@ -8,14 +8,18 @@
         <v-layout>
           <v-flex text-xs-center>
             <ReserveTable :reserves="reservations"
-                          @settlement="isActiveSettleModal"
-                          @cancel="isActiveCancelModal"
+                          @settlement="activeSettleModal"
+                          @cancel="activeCancelModal"
             >
             </ReserveTable>
           </v-flex>
           <SettlementModal :active="isActiveSettleModal"
                            @close="isActiveSettleModal = false"
-          >settlement</SettlementModal>
+          ></SettlementModal>
+          <CancelDialog :active="isActiveCancelModal"
+                  :message="cancelMsg"
+                  @close="isActiveCancelModal = false"
+          ></CancelDialog>
         </v-layout>
       </v-container>
     </v-main>
@@ -26,6 +30,7 @@
 import Breadcrumbs from "~/components/common/Breadcrumbs";
 import Web3 from "web3";
 import web3Mixin from "~~/client/user/mixins/web3Mixin";
+import CancelDialog from "~/components/common/CancelDialog";
 
 export default {
   name: "ReserveIndex",
@@ -37,14 +42,17 @@ export default {
       isActiveCancelModal: false,
     }
   },
-  components: {Breadcrumbs},
+  components: {CancelDialog, Breadcrumbs},
   async asyncData({app, error}) {
     let reservations = []
     try {
       const {data} = await app.$axios.get('/api/reserve_list')
       reservations = data.reservations ? data.reservations.map(v => {
         v.status = 'Loading'
-            return  v
+        if(v.merchant){
+          v.merchant.cancelable_days = `before ${Math.floor(v.merchant.cancelable_time / 60 / 60)} days`
+        }
+        return  v
       }) : []
     } catch (e) {
       error({
@@ -66,6 +74,9 @@ export default {
         'Loading', // front用
       ]
       return statuses[Math.floor(Math.random() * statuses.length)]
+    },
+    cancelMsg() {
+      return 'Can I really cancel this reservation?'
     }
   },
   mounted() {

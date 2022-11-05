@@ -8,14 +8,9 @@
             <v-card class="elevation-1 pa-3">
               <v-card-text>
                 <div class="layout column align-center">
-                  <h1 class="flex my-4 primary--text">Trust Reserve</h1>
+                  <img width="100%" src="/dark-logo.png" alt="trust reserve logo"/>
                 </div>
               </v-card-text>
-              <div class="layout column align-center">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="Metamask"
-                  width="80" height="80">
-              </div>
               <v-card-actions>
                 <metamask @connect="login"/>
               </v-card-actions>

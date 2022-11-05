@@ -10,7 +10,6 @@
         <v-card-text class="py-2">
           <p style="white-space:pre-wrap;" v-text="message"></p>
         </v-card-text>
-
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>

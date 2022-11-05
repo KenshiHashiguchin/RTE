@@ -1,6 +1,6 @@
 <template>
   <v-btn block color="primary" :loading="loading" @click="$emit('connect')">
-    Connect to Metamask
+    Enter
   </v-btn>
 </template>
 

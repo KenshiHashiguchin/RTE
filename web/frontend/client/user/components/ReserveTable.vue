@@ -35,14 +35,26 @@ export default {
           cellClass: 'text-no-wrap',
         },
         {
+          text: 'Name',
+          value: 'merchant.name',
+          class: 'text-no-wrap',
+          cellClass: 'text-no-wrap',
+        },
+        {
+          text: 'Deposit',
+          value: 'merchant.deposit',
+          class: 'text-no-wrap',
+          cellClass: 'text-no-wrap',
+        },
+        {
           text: 'Number of Visitors',
           value: 'number',
           class: 'text-no-wrap',
           cellClass: 'text-no-wrap',
         },
         {
-          text: 'Name',
-          value: 'name',
+          text: 'Cancelable Days (day)',
+          value: 'merchant.cancelable_days',
           class: 'text-no-wrap',
           cellClass: 'text-no-wrap',
         },

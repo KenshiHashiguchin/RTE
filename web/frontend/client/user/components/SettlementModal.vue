@@ -1,60 +1,61 @@
 <template>
-  <div class="text-center">
-    <v-dialog v-model="active"
-              width="350"
-    >
-      <v-card>
-        <!-- todo merchant name-->
-        <v-card-title class="mb-3 text-h4 justify-center">
-          Send To A
-        </v-card-title>
+  <v-dialog v-model="active"
+            @click:outside="close"
+            @keydown.esc="close"
+            width="350"
+            class="text-center"
+  >
+    <v-card>
+      <!-- todo merchant name-->
+      <v-card-title class="mb-3 text-h4 justify-center">
+        Send To A
+      </v-card-title>
 
-        <v-card-text class=text-center>
-          <div
-            class=" text-h2 inline-block"
-          >
-            {{ input.current }}
-          </div>
-        </v-card-text>
-        <v-card-actions class="justify-center">
-          <v-btn @click="next" color="primary">next</v-btn>
-        </v-card-actions>
-        <v-card-text class="pa-0">
-          <v-container grid-list-xs pa-1>
-            <v-layout row wrap pa0>
-              <v-flex v-for="button in buttons" :key="button.key" xs4 class="text-center mb-2">
-                <v-btn v-if="button.key"
-                       :class="['ma-0', button.class]"
-                       :color="button.color"
-                       @click="inputKey(button.key)"
-                       fab
-                       large
-                >
-                  <v-icon v-if="button.icon" dark>{{ button.icon }}</v-icon>
-                  <template v-else>{{ button.label }}</template>
-                </v-btn>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            @click="close"
-          >
-            close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
+      <v-card-text class=text-center>
+        <div
+          class=" text-h2 inline-block"
+        >
+          {{ input.current }}
+        </div>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-btn @click="next" color="primary">next</v-btn>
+      </v-card-actions>
+      <v-card-text class="pa-0">
+        <v-container grid-list-xs pa-1>
+          <v-layout row wrap pa0>
+            <v-flex v-for="button in buttons" :key="button.key" xs4 class="text-center mb-2">
+              <v-btn v-if="button.key"
+                     :class="['ma-0', button.class]"
+                     :color="button.color"
+                     @click="inputKey(button.key)"
+                     fab
+                     large
+              >
+                <v-icon v-if="button.icon" dark>{{ button.icon }}</v-icon>
+                <template v-else>{{ button.label }}</template>
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="primary"
+          text
+          @click="close"
+        >
+          close
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
 export default {
-  name: "settlementModal",
+  name: "SettlementModal",
   data() {
     return {
       input: {
