@@ -42,7 +42,7 @@
                           label
                           text-color="white"
                         >
-                          Number of visitors
+                          Number of Visitors
                         </v-chip>
                         {{ reservation.number }}
                       </v-list-item-title>
