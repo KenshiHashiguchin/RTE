@@ -7,8 +7,8 @@
         </div>
 
         <div id="site_reserve">
-          <p>ご予約はこちらから<!--ご予約はこちらから--></p>
-          <p class="site_tel">TEL:XXX-XXX-XXXX<!--TEL:000-000-0000--></p>
+          <a href="#access_reserve">ご予約はこちらから</a>
+          <p class="site_tel">TEL:{{merchant.tel}}</p>
         </div>
         <div class="clearlist"></div>
       </div>
