@@ -25,6 +25,6 @@ func (t reserve) Reserve(merchantAddress, reservedAddress, surname, firstname, t
 	if merchant == nil {
 		return errors.New("Don't exist")
 	}
-	reservation := model.NewReservation(paymentId, merchant.GetId(), reservedAddress, surname, firstname, tel, number)
+	reservation := model.NewReservation(paymentId, merchant.GetId(), reservedAddress, surname, firstname, tel, number, *merchant)
 	return t.reserveRepo.Save(reservation)
 }

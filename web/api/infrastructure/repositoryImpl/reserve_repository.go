@@ -34,28 +34,56 @@ func (r reserveImpl) Save(reservation model.Reservation) error {
 
 func (r reserveImpl) Get(address string) []model.Reservation {
 	reservationData := r.reserveDao.GetAllByAddress(address)
+	merchantData := r.merchantDao.GetAll()
+
 	var reservations []model.Reservation
 	for _, data := range reservationData {
-		reservations = append(reservations, model.NewReservation(
-			data.Id,
-			data.MerchantId,
-			data.ReservedAddress,
-			data.Surname,
-			data.Firstname,
-			data.Phonenumber,
-			data.Number,
-		))
+		for _, merchantD := range merchantData {
+			if merchantD.Id == data.MerchantId {
+				merchant := model.NewMerchant(
+					merchantD.Id,
+					merchantD.Address,
+					merchantD.ReceivedAddress,
+					merchantD.Name,
+					merchantD.MerchantAddress,
+					merchantD.Phonenumber,
+					merchantD.Deposit,
+					merchantD.CancelableTime,
+				)
+				reservations = append(reservations, model.NewReservation(
+					data.Id,
+					data.MerchantId,
+					data.ReservedAddress,
+					data.Surname,
+					data.Firstname,
+					data.Phonenumber,
+					data.Number,
+					merchant,
+				))
+			}
+		}
 	}
 	return reservations
 }
 
 func (r reserveImpl) GetByMerchantAddress(address string) []model.Reservation {
-	merchant := r.merchantDao.Get(address)
-	if merchant == nil {
+	merchantData := r.merchantDao.Get(address)
+	if merchantData == nil {
 		return nil
 	}
 
-	reservationData := r.reserveDao.GetAllByMerchantId(merchant.Id)
+	merchant := model.NewMerchant(
+		merchantData.Id,
+		merchantData.Address,
+		merchantData.ReceivedAddress,
+		merchantData.Name,
+		merchantData.MerchantAddress,
+		merchantData.Phonenumber,
+		merchantData.Deposit,
+		merchantData.CancelableTime,
+	)
+
+	reservationData := r.reserveDao.GetAllByMerchantId(merchantData.Id)
 	var reservations []model.Reservation
 	for _, data := range reservationData {
 		reservations = append(reservations, model.NewReservation(
@@ -66,6 +94,7 @@ func (r reserveImpl) GetByMerchantAddress(address string) []model.Reservation {
 			data.Firstname,
 			data.Phonenumber,
 			data.Number,
+			merchant,
 		))
 	}
 	return reservations
