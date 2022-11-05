@@ -1,7 +1,4 @@
-import daiAbi from "~/constants/dai_abi.json";
-import wethAbi from "~/constants/weth_abi.json";
-import usdtAbi from "~/constants/usdt_abi.json";
-import wmaticAbi from "~/constants/wmatic_abi.json";
+import erc20Abi from "~/constants/erc20_abi.json";
 
 const TOKEN_CONTRACT_ADDRESSES = [
   {
@@ -30,16 +27,10 @@ function getAbi(name){
   let abi = ''
   switch (name) {
     case 'DAI':
-      abi = daiAbi
-      break
     case 'WETH':
-      abi = wethAbi
-      break
     case 'USDT':
-      abi = usdtAbi
-      break
     case 'WMATIC':
-      abi = wmaticAbi
+      abi = erc20Abi
       break
     default:
       break;
