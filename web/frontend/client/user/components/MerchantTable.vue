@@ -8,7 +8,7 @@
     class="elevation-1"
   >
     <template v-slot:item.actions="{ item }">
-      <v-btn x-small @click="reserve(item)">Reserve</v-btn>
+      <ReserveDialog :merchant="item">Reserve</ReserveDialog>
       <a :href="`/merchant/${item.address}/show`" target="_blank">
         <v-btn x-small type="button">Detail</v-btn>
       </a>
@@ -17,8 +17,11 @@
 </template>
 
 <script>
+
+import ReserveDialog from "~~/client/user/components/ReserveDialog";
 export default {
   name: "MerchantTable",
+  components: {ReserveDialog},
   props: {
     merchants: {
       type: Array,
