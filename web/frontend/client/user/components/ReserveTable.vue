@@ -17,7 +17,7 @@
 
 <script>
 export default {
-  name: "reserveTable",
+  name: "ReserveTable",
   props: {
     reserves: {
       type: Array,

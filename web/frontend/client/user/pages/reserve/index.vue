@@ -8,17 +8,20 @@
         <v-layout>
           <v-flex text-xs-center>
             <ReserveTable :reserves="reservations"
-                          @settlement="activeSettleModal"
+                          @settlement="activeSettlementModal"
                           @cancel="activeCancelModal"
             >
             </ReserveTable>
           </v-flex>
-          <SettlementModal :active="isActiveSettleModal"
-                           @close="isActiveSettleModal = false"
+          <SettlementModal
+            :reservation="settlementReservation"
+            :active="isActiveSettlementModal"
+                           @close="closeSettlementModal"
           ></SettlementModal>
           <CancelDialog :active="isActiveCancelModal"
-                  :message="cancelMsg"
-                  @close="isActiveCancelModal = false"
+                        :message="cancelMsg"
+                        @next="execCancelContract"
+                        @close="closeCancelModal"
           ></CancelDialog>
         </v-layout>
       </v-container>
@@ -29,7 +32,7 @@
 <script>
 import Breadcrumbs from "~/components/common/Breadcrumbs";
 import Web3 from "web3";
-import web3Mixin from "~~/client/user/mixins/web3Mixin";
+import web3Mixin from "~/mixins/web3Mixin";
 import CancelDialog from "~/components/common/CancelDialog";
 
 export default {
@@ -38,8 +41,10 @@ export default {
   data() {
     return {
       reservations: [],
-      isActiveSettleModal: false,
+      isActiveSettlementModal: false,
       isActiveCancelModal: false,
+      settlementReservation: null,
+      cancelReservation: null,
     }
   },
   components: {CancelDialog, Breadcrumbs},
@@ -49,10 +54,10 @@ export default {
       const {data} = await app.$axios.get('/api/reserve_list')
       reservations = data.reservations ? data.reservations.map(v => {
         v.status = 'Loading'
-        if(v.merchant){
+        if (v.merchant) {
           v.merchant.cancelable_days = `before ${Math.floor(v.merchant.cancelable_time / 60 / 60)} days`
         }
-        return  v
+        return v
       }) : []
     } catch (e) {
       error({
@@ -97,16 +102,29 @@ export default {
         const contract = await this.getContract(instance, 'trustReserve')
         console.log(contract)
         const res = await contract.methods.getReservation(paymentId).call()
-        if(res) {
+        if (res) {
           targetReservation.status = res.status
         }
       } catch (error) {
         console.log(error)
       }
     },
-    async cancel(item){
+    async execSettleReservationContract() {
       try {
-        const paymentId = item.payment_id
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const accounts = await instance.eth.getAccounts()
+        const account = accounts[0]
+        const contract = await this.getContract(instance)
+        const res = await contract.methods.settleReservation().send({from: account})
+        console.log(res)
+        this.reservation = res
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async execCancelContract() {
+      try {
+        const paymentId = this.cancelReservation.payment_id
         const instance = this.createWeb3Instance(Web3.givenProvider)
         const accounts = await instance.eth.getAccounts()
         const account = accounts[0]
@@ -118,11 +136,21 @@ export default {
         console.log(error)
       }
     },
-    activeSettleModal() {
-      this.isActiveSettleModal = true
+    activeSettlementModal(item) {
+      this.isActiveSettlementModal = true
+      this.settlementReservation = item
     },
-    activeCancelModal() {
+    closeSettlementModal() {
+      this.isActiveSettlementModal = false
+      this.settlementReservation = null
+    },
+    activeCancelModal(item) {
       this.isActiveCancelModal = true
+      this.cancelReservation = item
+    },
+    closeCancelModal(item) {
+      this.isActiveCancelModal = false
+      this.cancelReservation = null
     }
   }
 }

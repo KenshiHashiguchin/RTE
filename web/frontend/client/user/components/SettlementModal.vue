@@ -7,8 +7,8 @@
   >
     <v-card>
       <!-- todo merchant name-->
-      <v-card-title class="mb-3 text-h4 justify-center">
-        Send To A
+      <v-card-title class="mb-5 text-h4 justify-center">
+        Send To {{toName}}
       </v-card-title>
 
       <v-card-text class=text-center>
@@ -18,7 +18,7 @@
           {{ input.current }}
         </div>
       </v-card-text>
-      <v-card-actions class="justify-center">
+      <v-card-actions class="justify-center my-5">
         <v-btn @click="next" color="primary">next</v-btn>
       </v-card-actions>
       <v-card-text class="pa-0">
@@ -54,6 +54,8 @@
 </template>
 
 <script>
+import {get} from 'lodash'
+
 export default {
   name: "SettlementModal",
   data() {
@@ -70,8 +72,15 @@ export default {
       type: Boolean,
       default: false,
     },
+    reservation: {
+      type: Object,
+      default: () => ({})
+    }
   },
   computed: {
+    toName() {
+      return get(this.reservation, 'merchant.name', '')
+    },
     buttons() {
       return [
         {key: "1", label: "1", color: "", class: "headline"},
