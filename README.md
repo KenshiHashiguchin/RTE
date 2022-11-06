@@ -2,6 +2,8 @@
 
 # 目次
 - [プロダクト概要](#プロダクト概要)
+- [コントラクトアドレス](#コントラクトアドレス)
+- [技術スタック](#技術スタック)
 - [事前準備](#事前準備)
 - [サービスログイン](#サービスログイン)
 - [tips](#tips)
@@ -117,7 +119,6 @@ yarn dev-merchant
 ```shell
  docker-compose exec ruby bundle exec ridgepole -a -c /db/config/database.yml -f /db/SchemaFile.rb -E default
 ```
-## Windows
 # サービスログイン
 
 ## ユーザー側
