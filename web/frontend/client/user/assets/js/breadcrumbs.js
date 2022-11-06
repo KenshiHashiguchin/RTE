@@ -39,7 +39,6 @@ function get(key){
     searchKey = item.parent
     disabled = false
   }
-  console.log(breadcrumbs)
   return breadcrumbs
 }
 

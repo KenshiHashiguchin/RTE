@@ -20,6 +20,7 @@
           ></SettlementModal>
           <CancelDialog :active="isActiveCancelModal"
                         :message="cancelMsg"
+                        :step="cancelContractStep"
                         @next="execCancelContract"
                         @close="closeCancelModal"
           ></CancelDialog>
@@ -45,6 +46,7 @@ export default {
       isActiveCancelModal: false,
       settlementReservation: null,
       cancelReservation: null,
+      cancelContractStep: 1,
     }
   },
   components: {CancelDialog, Breadcrumbs},
@@ -53,7 +55,7 @@ export default {
     try {
       const {data} = await app.$axios.get('/api/reserve_list')
       reservations = data.reservations ? data.reservations.map(v => {
-        v.status = 'Loading'
+        v.status = 'Loading...'
         if (v.merchant) {
           v.merchant.cancelable_days = `before ${Math.floor(v.merchant.cancelable_time / 60 / 60)} days`
         }
@@ -71,17 +73,24 @@ export default {
   },
   computed: {
     statues() {
-      const statuses = [
-        'None',
-        'Reserved',
-        'Canceled',
-        'Settled',
-        'Loading', // front用
+      return [
+        {label: 'None', value: "0"},
+        {label: 'Reserved',value: "1"},
+        {label: 'Canceled',value: "2"},
+        {label: 'Settled', value: "3"},
+        {label: 'Loading...', value: null} // front用
       ]
-      return statuses[Math.floor(Math.random() * statuses.length)]
     },
     cancelMsg() {
-      return 'Can I really cancel this reservation?'
+      if(this.cancelContractStep === 1){
+        return 'Can I really cancel this reservation?'
+      }else if(this.cancelContractStep === 2) {
+        return 'Processing...'
+      }else if(this.cancelContractStep === 3) {
+        return 'Cancel Committed'
+      }else if(this.cancelContractStep === 9) {
+        return 'Cancel Failed, Please Retry After Few Minute'
+      }
     }
   },
   mounted() {
@@ -93,17 +102,14 @@ export default {
     async getReservationContract(item) {
       try {
         const paymentId = item.payment_id
-        console.log('item.id')
-        console.log(item.id)
-        const targetReservation = this.reservations.find(v => v.id = paymentId)
-
+        const targetReservation = this.reservations.find(v => v.payment_id === paymentId)
         const instance = this.createWeb3Instance(Web3.givenProvider)
-        console.log(instance)
         const contract = await this.getContract(instance, 'trustReserve')
-        console.log(contract)
         const res = await contract.methods.getReservation(paymentId).call()
         if (res) {
-          targetReservation.status = res.status
+          console.log(res)
+          const status = this.statues.find(v => v.value === res.status)
+          targetReservation.status = status.label
         }
       } catch (error) {
         console.log(error)
@@ -124,14 +130,23 @@ export default {
     },
     async execCancelContract() {
       try {
+        this.cancelContractStep = 2
         const paymentId = this.cancelReservation.payment_id
         const instance = this.createWeb3Instance(Web3.givenProvider)
         const accounts = await instance.eth.getAccounts()
         const account = accounts[0]
         const contract = await this.getContract(instance)
-        const res = await contract.methods.cancel(paymentId).send({from: account})
+        await contract.methods.cancel(paymentId).send({from: account})
+          .then((result) => {
+            console.log(result)
+            this.cancelContractStep = 3
+            this.reservations.find(v => v.payment_id === this.cancelReservation.payment_id).status = 'Canceled'
+        }).catch((err) => {
+          console.log("Error!", err)
+          this.cancelContractStep = 9
+        })
+        this.cancelReservation = null
 
-        console.log(res)
       } catch (error) {
         console.log(error)
       }
