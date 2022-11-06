@@ -11,13 +11,21 @@
       </v-card-title>
       <v-card-text class="py-2">
         <p style="white-space:pre-wrap;" v-text="message"></p>
+        <div v-if="step === cancelingStep" class="text-center my-4">
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
+        </div>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
+          v-if="step === firstStep"
           color="primary"
           text
+          :disabled="step === cancelingStep"
           @click="next"
         >
           yes
@@ -25,6 +33,7 @@
         <v-btn
           color="primary"
           text
+          :disabled="step === cancelingStep"
           @click="close"
         >
           close
@@ -38,6 +47,10 @@
 export default {
   name: "CancelDialog",
   props: {
+    step: {
+      type: Number,
+      default: 1,
+    },
     active: {
       type: Boolean,
       default: false,
@@ -45,6 +58,20 @@ export default {
     message: {
       type: String,
       default: ''
+    }
+  },
+  computed: {
+    firstStep() {
+      return 1
+    },
+    cancelingStep() {
+      return 2
+    },
+    completeStep() {
+      return 3
+    },
+    failedStep() {
+      return 9
     }
   },
   methods: {

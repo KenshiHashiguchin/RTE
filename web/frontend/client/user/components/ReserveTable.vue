@@ -10,14 +10,14 @@
       <a :href="detailUrl(item)" target="_blank">
         <v-btn x-small :disabled="!item" type="button">Detail</v-btn>
       </a>
-      <v-btn x-small @click="cancel(item)" color="accent">Cancel</v-btn>
+      <v-btn v-if="cancelable(item.status)" x-small @click="cancel(item)" color="accent">Cancel</v-btn>
     </template>
   </v-data-table>
 </template>
 
 <script>
 export default {
-  name: "reserveTable",
+  name: "ReserveTable",
   props: {
     reserves: {
       type: Array,
@@ -76,6 +76,9 @@ export default {
     },
     settlement(item) {
       this.$emit('settlement', item)
+    },
+    cancelable(status) {
+      return status === 'Reserved'
     }
   }
 }

@@ -8,17 +8,21 @@
         <v-layout>
           <v-flex text-xs-center>
             <ReserveTable :reserves="reservations"
-                          @settlement="activeSettleModal"
+                          @settlement="activeSettlementModal"
                           @cancel="activeCancelModal"
             >
             </ReserveTable>
           </v-flex>
-          <SettlementModal :active="isActiveSettleModal"
-                           @close="isActiveSettleModal = false"
+          <SettlementModal
+            :reservation="settlementReservation"
+            :active="isActiveSettlementModal"
+                           @close="closeSettlementModal"
           ></SettlementModal>
           <CancelDialog :active="isActiveCancelModal"
-                  :message="cancelMsg"
-                  @close="isActiveCancelModal = false"
+                        :message="cancelMsg"
+                        :step="cancelContractStep"
+                        @next="execCancelContract"
+                        @close="closeCancelModal"
           ></CancelDialog>
         </v-layout>
       </v-container>
@@ -29,7 +33,7 @@
 <script>
 import Breadcrumbs from "~/components/common/Breadcrumbs";
 import Web3 from "web3";
-import web3Mixin from "~~/client/user/mixins/web3Mixin";
+import web3Mixin from "~/mixins/web3Mixin";
 import CancelDialog from "~/components/common/CancelDialog";
 
 export default {
@@ -38,8 +42,11 @@ export default {
   data() {
     return {
       reservations: [],
-      isActiveSettleModal: false,
+      isActiveSettlementModal: false,
       isActiveCancelModal: false,
+      settlementReservation: null,
+      cancelReservation: null,
+      cancelContractStep: 1,
     }
   },
   components: {CancelDialog, Breadcrumbs},
@@ -48,11 +55,11 @@ export default {
     try {
       const {data} = await app.$axios.get('/api/reserve_list')
       reservations = data.reservations ? data.reservations.map(v => {
-        v.status = 'Loading'
-        if(v.merchant){
+        v.status = 'Loading...'
+        if (v.merchant) {
           v.merchant.cancelable_days = `before ${Math.floor(v.merchant.cancelable_time / 60 / 60)} days`
         }
-        return  v
+        return v
       }) : []
     } catch (e) {
       error({
@@ -66,17 +73,24 @@ export default {
   },
   computed: {
     statues() {
-      const statuses = [
-        'None',
-        'Reserved',
-        'Canceled',
-        'Settled',
-        'Loading', // front用
+      return [
+        {label: 'None', value: "0"},
+        {label: 'Reserved',value: "1"},
+        {label: 'Canceled',value: "2"},
+        {label: 'Settled', value: "3"},
+        {label: 'Loading...', value: null} // front用
       ]
-      return statuses[Math.floor(Math.random() * statuses.length)]
     },
     cancelMsg() {
-      return 'Can I really cancel this reservation?'
+      if(this.cancelContractStep === 1){
+        return 'Can I really cancel this reservation?'
+      }else if(this.cancelContractStep === 2) {
+        return 'Processing...'
+      }else if(this.cancelContractStep === 3) {
+        return 'Cancel Committed'
+      }else if(this.cancelContractStep === 9) {
+        return 'Cancel Failed, Please Retry After Few Minute'
+      }
     }
   },
   mounted() {
@@ -88,41 +102,70 @@ export default {
     async getReservationContract(item) {
       try {
         const paymentId = item.payment_id
-        console.log('item.id')
-        console.log(item.id)
-        const targetReservation = this.reservations.find(v => v.id = paymentId)
-
+        const targetReservation = this.reservations.find(v => v.payment_id === paymentId)
         const instance = this.createWeb3Instance(Web3.givenProvider)
-        console.log(instance)
         const contract = await this.getContract(instance, 'trustReserve')
-        console.log(contract)
         const res = await contract.methods.getReservation(paymentId).call()
-        if(res) {
-          targetReservation.status = res.status
+        if (res) {
+          console.log(res)
+          const status = this.statues.find(v => v.value === res.status)
+          targetReservation.status = status.label
         }
       } catch (error) {
         console.log(error)
       }
     },
-    async cancel(item){
+    async execSettleReservationContract() {
       try {
-        const paymentId = item.payment_id
         const instance = this.createWeb3Instance(Web3.givenProvider)
         const accounts = await instance.eth.getAccounts()
         const account = accounts[0]
         const contract = await this.getContract(instance)
-        const res = await contract.methods.cancel(paymentId).send({from: account})
-
+        const res = await contract.methods.settleReservation().send({from: account})
         console.log(res)
+        this.reservation = res
       } catch (error) {
         console.log(error)
       }
     },
-    activeSettleModal() {
-      this.isActiveSettleModal = true
+    async execCancelContract() {
+      try {
+        this.cancelContractStep = 2
+        const paymentId = this.cancelReservation.payment_id
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const accounts = await instance.eth.getAccounts()
+        const account = accounts[0]
+        const contract = await this.getContract(instance)
+        await contract.methods.cancel(paymentId).send({from: account})
+          .then((result) => {
+            console.log(result)
+            this.cancelContractStep = 3
+            this.reservations.find(v => v.payment_id === this.cancelReservation.payment_id).status = 'Canceled'
+        }).catch((err) => {
+          console.log("Error!", err)
+          this.cancelContractStep = 9
+        })
+        this.cancelReservation = null
+
+      } catch (error) {
+        console.log(error)
+      }
     },
-    activeCancelModal() {
+    activeSettlementModal(item) {
+      this.isActiveSettlementModal = true
+      this.settlementReservation = item
+    },
+    closeSettlementModal() {
+      this.isActiveSettlementModal = false
+      this.settlementReservation = null
+    },
+    activeCancelModal(item) {
       this.isActiveCancelModal = true
+      this.cancelReservation = item
+    },
+    closeCancelModal(item) {
+      this.isActiveCancelModal = false
+      this.cancelReservation = null
     }
   }
 }
