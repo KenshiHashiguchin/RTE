@@ -18,7 +18,7 @@
 
 <script>
 
-import ReserveDialog from "~~/client/user/components/ReserveDialog";
+import ReserveDialog from "~/components/ReserveDialog";
 export default {
   name: "MerchantTable",
   components: {ReserveDialog},
