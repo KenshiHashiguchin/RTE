@@ -187,6 +187,9 @@ export default {
     completeStep() {
       return 3
     },
+    receiveTokenAmount() {
+      return this.input.current
+    },
     toName() {
       return get(this.reservation, 'merchant.name', '')
     },
@@ -299,35 +302,39 @@ export default {
       }
     },
     async calcRequiredAmount() {
-      await window.ethereum.request({method: 'eth_requestAccounts'})
-      const instance = this.createWeb3Instance(window.ethereum)
-      const networkId = await instance.eth.net.getId();
-      const from = new Token(networkId, this.receiveAddress, this.receiveTokenDecimals, this.receiveTokenName, this.receiveTokenName)
-      const to = new Token(networkId, this.paymentAddress, this.paymentTokenDecimal, this.paymentTokenName, this.paymentTokenName)
+      try {
+        await window.ethereum.request({method: 'eth_requestAccounts'})
+        const instance = this.createWeb3Instance(window.ethereum)
+        const networkId = await instance.eth.net.getId();
+        const from = new Token(networkId, this.receiveAddress, this.receiveTokenDecimals, this.receiveTokenName, this.receiveTokenName)
+        const to = new Token(networkId, this.paymentAddress, this.paymentTokenDecimal, this.paymentTokenName, this.paymentTokenName)
 
-      const requireAmount = CurrencyAmount.fromRawAmount(from, this.receiveTokenAmount)
-      const web3Provider = new ethers.providers.JsonRpcProvider(process.env.infuraUrl)
-      const router = new AlphaRouter({chainId: networkId, provider: web3Provider})
-      const route = await router.route(
-        requireAmount,
-        to,
-        TradeType.EXACT_OUTPUT,
-        {
-          recipient: this.receiveAddress, // FIXME
-          slippageTolerance: new Percent(25, 100),
-          deadline: Math.floor(Date.now() / 1000 + 1800)
+        const requireAmount = CurrencyAmount.fromRawAmount(from, this.receiveTokenAmount)
+        const web3Provider = new ethers.providers.JsonRpcProvider(process.env.infuraUrl)
+        const router = new AlphaRouter({chainId: networkId, provider: web3Provider})
+        const route = await router.route(
+          requireAmount,
+          to,
+          TradeType.EXACT_OUTPUT,
+          {
+            recipient: this.receiveAddress, // FIXME
+            slippageTolerance: new Percent(25, 100),
+            deadline: Math.floor(Date.now() / 1000 + 1800)
+          }
+        )
+        this.paymentAmount = route.quote.toFixed(this.paymentTokenDecimal)
+        // swapするpath(settleReservationの_path引数)
+        this.pathAddresses = route.trade.routes[0].path
+
+        console.log("this.allowance")
+        console.log(this.allowance)
+        if (this.paymentAmount * (10 ** this.paymentTokenDecimal) > this.allowance) {
+          this.isApprove = true
         }
-      )
-      this.paymentAmount = route.quote.toFixed(this.paymentTokenDecimal)
-      // swapするpath(settleReservationの_path引数)
-      this.pathAddresses = route.trade.routes[0].path
-
-      console.log("this.allowance")
-      console.log(this.allowance)
-      if (this.paymentAmount * (10 ** this.paymentTokenDecimal) > this.allowance) {
-        this.isApprove = true
+        this.loading = false
+      }catch(e){
+        console.log(e)
       }
-      this.loading = false
     },
     async send() {
       try {
@@ -361,8 +368,8 @@ export default {
         const contract = await this.getContract(instance)
         const datetime = new Date()
         const res = await contract.methods.settleReservation(
-          this.input,
-          this.input,
+          this.receiveTokenAmount,
+          this.receiveTokenAmount,
           datetime.getTime(),
           this.pathAddresses,
           this.reservation.payment_id
