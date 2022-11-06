@@ -30,7 +30,7 @@
 
         </v-card>
         <v-layout wrap class="mt-5">
-          <v-flex md4>
+          <v-flex md6>
             <div class="text-center">
               <NuxtLink class="d-block" to="/merchant">
                 <v-icon>store</v-icon>
@@ -40,22 +40,12 @@
               </NuxtLink>
             </div>
           </v-flex>
-          <v-flex md4>
+          <v-flex md6>
             <div class="text-center">
               <NuxtLink class="d-block" to="/reserve">
                 <v-icon>mdi-calendar-check-outline</v-icon>
                 <div class="mt-2">
                   <span class="d-inline-block">reservations</span>
-                </div>
-              </NuxtLink>
-            </div>
-          </v-flex>
-          <v-flex md4>
-            <div class="text-center">
-              <NuxtLink class="d-block" to="/setting">
-                <v-icon>mdi-cog-outline</v-icon>
-                <div class="mt-2">
-                  <span class="d-inline-block">settings</span>
                 </div>
               </NuxtLink>
             </div>
