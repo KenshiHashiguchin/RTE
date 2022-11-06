@@ -60,6 +60,12 @@ export default {
         address
       )
     },
+    async getUtilityTokenContract(web3Instance) {
+      return new web3Instance.eth.Contract(
+        tokenContactAddresses.getUtilityTokenAbi(),
+        tokenContactAddresses.getUtilityTokenAddress()
+      )
+    },
     createWeb3Instance(provider) {
       if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
         return new Web3(provider)
