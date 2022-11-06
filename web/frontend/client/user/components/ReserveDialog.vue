@@ -21,7 +21,7 @@
       <v-card-text>
         <br>
         <div>
-          <p><b>Deposit amount</b>：{{ merchant.deposit }}({{ erc20Address }})
+          <p><b>Required deposit amount</b>：{{ merchant.deposit }}({{ erc20Address }})
             <small>　　※You are free to choose the tokens you wish to pay.</small>
           </p>
         </div>
@@ -86,6 +86,7 @@
                       v-model="date"
                       no-title
                       scrollable
+                      :min="this.reservableDate"
                       @click:date="$refs.dateCalender.save(date)"
                   >
                   </v-date-picker>
@@ -150,6 +151,7 @@
         </template>
         <template v-else>
           <Payment
+              @close='showPayment = false'
               :receive-token-amount="merchant.deposit"
               :receive-token-name="merchant.name"
               :receive-address="merchant.received_address"
@@ -212,6 +214,17 @@ export default {
 
       return this.merchant.received_address
     },
+    reservableDate() {
+      let now =new Date();
+      now.setDate(now.getDate() + 1);
+      return now.toLocaleDateString("ja-JP", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+          .split("/")
+          .join("-");
+    }
   },
   methods: {
     allowedStep: m => m % 15 === 0,

@@ -22,6 +22,7 @@ type Reserves struct {
 	Firstname       string    `db:"firstname"`
 	Phonenumber     string    `db:"phonenumber"`
 	Number          uint      `db:"number"`
+	ReserveTs       time.Time `db:"reserve_ts"`
 	CreateTs        time.Time `db:"create_ts"`
 	UpdateTs        time.Time `db:"update_ts"`
 }

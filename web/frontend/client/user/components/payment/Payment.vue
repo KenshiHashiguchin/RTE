@@ -22,10 +22,23 @@
             </v-btn>
           </v-col>
         </v-row>
+        <v-row align="center">
+          <v-col
+              cols="12"
+              sm="12"
+          >
+            <div class="text-center">
+              <v-btn class="text-center" @click="closePayment">
+                back
+              </v-btn>
+            </div>
+          </v-col>
+        </v-row>
       </v-container>
     </template>
     <template v-else>
       <CalcTokenAmount
+          @close='displayTokenAmount = false'
           :from-name="receiveTokenName"
           :from-decimal="receiveTokenDecimals"
           :from-amount="receiveTokenAmount"
@@ -158,12 +171,15 @@ export default {
       console.log(item.address)
       this.paymentAddress = item.address
       this.displayTokenAmount = true
+    },
+    closePayment() {
+      this.$emit("close")
     }
   },
   mounted() {
     this.setBalances()
     this.setReceiveTokenDecimals()
-  }
+  },
 }
 </script>
 

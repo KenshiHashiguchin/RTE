@@ -4,6 +4,7 @@ import (
 	"github.com/RTE/web/api/domain/model"
 	repo "github.com/RTE/web/api/domain/repository"
 	"github.com/RTE/web/api/infrastructure/dao"
+	"log"
 )
 
 type reserveImpl struct {
@@ -18,15 +19,19 @@ func NewReserveRepository(reserveDao dao.IReserveDao, merchantDao dao.IMerchantD
 func (r reserveImpl) Save(reservation model.Reservation) error {
 	_, err := r.merchantDao.GetById(reservation.GetMerchantId())
 	if err != nil {
+		log.Print("error get by id")
 		return err
 	}
 
 	reserve := dao.Reserves{
+		Id:              reservation.GetPaymentId(),
 		ReservedAddress: reservation.GetReservedAddress(),
 		MerchantId:      reservation.GetMerchantId(),
 		Surname:         reservation.GetSurname(),
+		Phonenumber:     reservation.GetTel(),
 		Firstname:       reservation.GetFirstname(),
 		Number:          reservation.GetNumber(),
+		ReserveTs:       reservation.GetReserveTs(),
 	}
 
 	return r.reserveDao.Save(reserve)
@@ -58,6 +63,7 @@ func (r reserveImpl) Get(address string) []model.Reservation {
 					data.Firstname,
 					data.Phonenumber,
 					data.Number,
+					data.ReserveTs,
 					merchant,
 				))
 			}
@@ -94,6 +100,7 @@ func (r reserveImpl) GetByMerchantAddress(address string) []model.Reservation {
 			data.Firstname,
 			data.Phonenumber,
 			data.Number,
+			data.ReserveTs,
 			merchant,
 		))
 	}

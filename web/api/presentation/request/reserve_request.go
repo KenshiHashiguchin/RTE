@@ -2,16 +2,16 @@ package request
 
 import (
 	"github.com/go-playground/validator/v10"
-	"time"
 )
 
 type Reserve struct {
-	MerchantAddress string    `json:"merchant_address" validate:"required"`
-	Surname         string    `json:"surname" validate:"required,max=30"`
-	Firstname       string    `json:"firstname" validate:"required,max=30"`
-	Phonenumber     string    `json:"phonenumber" validate:"required,max=12"`
-	Number          uint      `json:"number" validate:"required,min=1,max=100"`
-	Time            time.Time `json:"time" validate:"required,min=1,max=100"`
+	PaymentId       string `json:"payment_id" validate:"required"`
+	MerchantAddress string `json:"merchant_address" validate:"required"`
+	Surname         string `json:"surname" validate:"required,max=30"`
+	Firstname       string `json:"firstname" validate:"required,max=30"`
+	Phonenumber     string `json:"phonenumber" validate:"required,max=20"`
+	Number          uint   `json:"number" validate:"required,min=1,max=100"`
+	Time            uint   `json:"time" validate:"required"`
 }
 
 func (r *Reserve) Validate() (ok bool, error map[string]string) {
@@ -60,9 +60,10 @@ func (r *Reserve) Validate() (ok bool, error map[string]string) {
 	}
 
 	// time
-	if r.Time.After(time.Now()) {
-		result["Time"] = "不正な日付です。"
-	}
+	//time := time.Unix(int64(r.Time), 0)
+	//if time.After(time.No) {
+	//	result["Time"] = "不正な日付です。"
+	//}
 
 	return true, nil
 }
