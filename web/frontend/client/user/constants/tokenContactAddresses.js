@@ -42,8 +42,18 @@ function getAbi(name){
   return abi
 }
 
+function getUtilityTokenAbi() {
+  return erc20Abi
+}
+
+function getUtilityTokenAddress() {
+  return "0xAbc09cA0fc00827ee3C868Bd602D3c9E5B60ef6e"
+}
+
 export default {
   TOKEN_CONTRACT_ADDRESSES,
   getAddress,
   getAbi,
+  getUtilityTokenAbi,
+  getUtilityTokenAddress,
 }
