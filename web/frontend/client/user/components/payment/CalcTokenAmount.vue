@@ -7,6 +7,11 @@
     >
       <v-row>
         <v-col cols="12">
+          <h2 class="text-center">
+            {{ toName }}
+          </h2>
+        </v-col>
+        <v-col cols="12">
           <div v-if="loading" class="text-center">
             <v-progress-circular
                 indeterminate
@@ -14,52 +19,20 @@
             ></v-progress-circular>
           </div>
           <div v-else class="text-center">
-            <h2 class="text-center">
-              Deposit amount for {{ toName }}: {{ paymentAmount }}
-            </h2>
+            <h3 class="text-center">
+              {{ paymentAmount }}
+            </h3>
             <br>
-            <p v-if="isBalanceErr" style="color: red">
-              Balance is not enough
-            </p>
-            <v-btn class="text-center" @click="back">
-              back
-            </v-btn>
-            <v-btn v-if="!isApprove && !isBalanceErr" color="primary" class="text-center" @click="reserve"
-                   :loading="reserveLoading"
-                   :disabled="reserveLoading"
-            >
+            <v-btn v-if="!isApprove" color="primary" class="text-center" @click="reserve">
               Pay token for the deposit
             </v-btn>
-            <v-btn v-else-if="!isBalanceErr" color="teal lighten-4" class="text-center" @click="approve"
-                   :loading="approveLoading"
-                   :disabled="approveLoading"
-            >
+            <v-btn v-else color="teal lighten-4" class="text-center" @click="approve">
               approve token for the deposit
             </v-btn>
           </div>
         </v-col>
       </v-row>
     </v-container>
-    <v-dialog
-        v-model="completeDialog"
-        persistent
-        light
-        max-width="500px"
-    >
-      <v-card>
-        <v-card-title class="text-center">
-          <v-spacer></v-spacer>
-        </v-card-title>
-        <v-card-text class="text-center">
-          <h2 class="text-center" style="display: block">Reservation made!</h2>
-          <v-btn color="primary" class="text-center" style="margin-top: 30px"
-                 @click="goReserve"
-          >
-            reservation list
-          </v-btn>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -118,21 +91,11 @@ export default {
   },
   data: () => ({
     loading: true,
-    approveLoading: false,
-    reserveLoading: false,
     paymentAmount: 0,
     isApprove: false,
     allowance: 0,
-    completeDialog: false,
-    paymentId: null,
-    isBalanceErr: false,
   }),
-  computed: {
-    unixtime() {
-      const datetime = new Date(this.reservation.date + ' ' + this.reservation.time)
-      return datetime.getTime() / 1000
-    },
-  },
+  computed: {},
   methods: {
     async setAllowance() {
       try {
@@ -167,11 +130,9 @@ export default {
           }
       )
       this.paymentAmount = route.quote.toFixed(this.toDecimal)
-      if (this.toBalance < this.paymentAmount * (10 ** this.toDecimal)) {
-        this.isBalanceErr = true
-        this.loading = false
-        return
-      }
+      // swapするpath(settleReservationの_path引数)
+      console.log(route.trade.routes[0].path)
+
       console.log("this.allowance")
       console.log(this.allowance)
       if (this.paymentAmount * (10 ** this.toDecimal) > this.allowance) {
@@ -181,7 +142,6 @@ export default {
     },
     async approve() {
       try {
-        this.approveLoading = true
         const instance = this.createWeb3Instance(Web3.givenProvider)
         const address = await instance.eth.getCoinbase();
         const contract = await this.getContract(instance, this.toName)
@@ -190,69 +150,43 @@ export default {
         const approve = await contract.methods.approve(contractAddress, this.paymentAmount * (10 ** this.toDecimal))
             .send({from: address})
         console.log(approve)
-        this.isApprove = false
-        this.approveLoading = true
+
       } catch (error) {
         console.log(error)
-        this.approveLoading = false
       }
     },
     async reserve() {
       try {
-        this.reserveLoading = true
         const instance = this.createWeb3Instance(Web3.givenProvider)
         const address = await instance.eth.getCoinbase();
         const contract = await this.getContract(instance)
 
-        this.paymentId = Math.random().toString(32).substring(2)
-        console.log(this.paymentId)
+        const paymentId = Math.random().toString(32).substring(2)
+        console.log('---paymentId----')
+        console.log(paymentId)
+
+        // calc timestamp
+        const datetime = new Date(this.reservation.date +' '+this.reservation.time)
+        console.log('---datetime.getTime()---')
+        console.log(datetime.getTime())
+
         const reserve = await contract.methods.reserve(
-            this.paymentId,
+            paymentId,
             this.merchant.address,
             this.toAddress,
             this.paymentAmount * (10 ** this.toDecimal),
-            this.unixtime - this.merchant.cancelable_time,
-            this.unixtime + 100000
+            datetime.getTime(),
+            // datetime.getTime() - this.merchant.cancelable_time,
+            datetime.getTime() + 100000
         )
             .send({from: address})
-        console.log(this.unixtime)
-        console.log(this.unixtime - this.merchant.cancelable_time)
-        console.log(this.unixtime + 100000)
+        console.log('---reserve----')
         console.log(reserve)
-        await this.saveReserve()
-        this.reserveLoading = false
-        this.completeDialog = true
 
       } catch (error) {
         console.log(error)
-        this.reserveLoading = false
       }
     },
-    async saveReserve() {
-      try {
-        const datetime = new Date(this.reservation.date + ' ' + this.reservation.time)
-        const {data} = await this.$axios.post('/api/reserve', {
-          payment_id: this.paymentId,
-          merchant_address: this.merchant.address,
-          surname: this.reservation.surname,
-          firstname: this.reservation.firstname,
-          phonenumber: this.reservation.phonenumber,
-          number: this.reservation.number,
-          time: this.unixtime,
-        })
-        console.log(data)
-      } catch (e) {
-        // todo
-        this.error = e
-      }
-    },
-    goReserve() {
-      this.completeDialog = false
-      this.$router.push('/reserve')
-    },
-    back() {
-      this.$emit("close")
-    }
   },
   mounted() {
     this.setAllowance()

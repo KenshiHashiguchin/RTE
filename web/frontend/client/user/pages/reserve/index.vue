@@ -16,6 +16,9 @@
           <SettlementModal
             :reservation="settlementReservation"
             :active="isActiveSettlementModal"
+            :step="settlementContractStep"
+            @back="backSettleReservationStep"
+            @next="execSettleReservationContract"
                            @close="closeSettlementModal"
           ></SettlementModal>
           <CancelDialog :active="isActiveCancelModal"
@@ -45,6 +48,7 @@ export default {
       isActiveSettlementModal: false,
       isActiveCancelModal: false,
       settlementReservation: null,
+      settlementContractStep: 1,
       cancelReservation: null,
       cancelContractStep: 1,
     }
@@ -110,23 +114,35 @@ export default {
           console.log(res)
           const status = this.statues.find(v => v.value === res.status)
           targetReservation.status = status.label
+          targetReservation.depositAmount = res.depositAmount
         }
       } catch (error) {
         console.log(error)
       }
     },
-    async execSettleReservationContract() {
-      try {
-        const instance = this.createWeb3Instance(Web3.givenProvider)
-        const accounts = await instance.eth.getAccounts()
-        const account = accounts[0]
-        const contract = await this.getContract(instance)
-        const res = await contract.methods.settleReservation().send({from: account})
-        console.log(res)
-        this.reservation = res
-      } catch (error) {
-        console.log(error)
+    async execSettleReservationContract(nextStep) {
+      console.log('---nextStep---')
+      console.log(nextStep)
+      if(nextStep === 'inputSendAmountStep'){
+        this.settlementContractStep = 2
+      }else if(nextStep === 'complete'){
+        this.settlementContractStep = 3
+        this.reservations.find(v => v.payment_id === this.settlementReservation.payment_id).status = 'Settled'
       }
+      // try {
+      //   const instance = this.createWeb3Instance(Web3.givenProvider)
+      //   const accounts = await instance.eth.getAccounts()
+      //   const account = accounts[0]
+      //   const contract = await this.getContract(instance)
+      //   const res = await contract.methods.settleReservation().send({from: account})
+      //   console.log(res)
+      //   this.reservation = res
+      // } catch (error) {
+      //   console.log(error)
+      // }
+    },
+    backSettleReservationStep() {
+      this.settlementContractStep = this.settlementContractStep - 1
     },
     async execCancelContract() {
       try {
@@ -152,6 +168,7 @@ export default {
       }
     },
     activeSettlementModal(item) {
+      this.settlementContractStep = 1
       this.isActiveSettlementModal = true
       this.settlementReservation = item
     },
@@ -160,6 +177,7 @@ export default {
       this.settlementReservation = null
     },
     activeCancelModal(item) {
+      this.cancelContractStep = 1
       this.isActiveCancelModal = true
       this.cancelReservation = item
     },

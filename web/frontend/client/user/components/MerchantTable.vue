@@ -2,6 +2,7 @@
   <v-data-table
     :headers="headers"
     :items="merchants"
+    :disable-sort="true"
     :hide-default-footer="true"
     @delete=""
     @delete-confirm=""
