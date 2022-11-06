@@ -15,7 +15,7 @@ func initDb() *gorp.DbMap {
 		log.Fatal(err)
 	}
 	dbmap.AddTableWithName(Merchant{}, "merchants").SetKeys(true, "Id")
-	dbmap.AddTableWithName(Reserves{}, "reserves").SetKeys(true, "Id")
+	dbmap.AddTableWithName(Reserves{}, "reserves")
 
 	return &dbmap
 }

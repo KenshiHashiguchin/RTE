@@ -3,6 +3,7 @@ package model
 import (
 	"crypto/rand"
 	"errors"
+	"time"
 )
 
 type Reservation struct {
@@ -13,10 +14,11 @@ type Reservation struct {
 	firstname       string
 	tel             string
 	number          uint
+	reserveTs       time.Time
 	merchant        Merchant
 }
 
-func NewReservation(paymentId string, merchantId uint, reservedAddress, surname, firstname, tel string, number uint, merchant Merchant) Reservation {
+func NewReservation(paymentId string, merchantId uint, reservedAddress, surname, firstname, tel string, number uint, reserveTs time.Time, merchant Merchant) Reservation {
 	return Reservation{
 		paymentId,
 		merchantId,
@@ -25,6 +27,7 @@ func NewReservation(paymentId string, merchantId uint, reservedAddress, surname,
 		firstname,
 		tel,
 		number,
+		reserveTs,
 		merchant,
 	}
 }
@@ -55,6 +58,10 @@ func (r Reservation) GetTel() string {
 
 func (r Reservation) GetNumber() uint {
 	return r.number
+}
+
+func (r Reservation) GetReserveTs() time.Time {
+	return r.reserveTs
 }
 
 func (r Reservation) GetMerchant() Merchant {
