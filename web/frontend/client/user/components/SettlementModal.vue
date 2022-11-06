@@ -6,7 +6,6 @@
             class="text-center"
   >
     <v-card>
-      <!-- todo merchant name-->
       <v-card-title class="mb-5 text-h4 justify-center">
         Send To {{toName}}
       </v-card-title>
