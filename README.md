@@ -21,6 +21,24 @@ TrustReserveは「予約通り飲食店に来店すること」にWeb3の技術�
 - 事業者が信頼度に応じて予約者を優遇したり、特別なプランを用意するなどの利用を想定。
   - 将来的には信頼度に応じて1予約で付与されるTRESを増やすことも可能。
 
+# コントラクトアドレス
+- ProxyContract: 0x9C005e05c363060D08C9C60c42618a9D3DA98827
+- ReserveContract: 0x6446a4cB145Ac9c20BEBe8282F240aC76AC4cbd1
+- UtilityTokenContract: 0x3Be0a452EFF14E79228143090f5b35bB05CAae1A
+
+ProxyContract: ReserveContractのプロキシコントラクトです。規格はEIP-2535になります。将来的にDAOコントラクトをデプロイする想定です。
+ReserveContract: 予約時にデポジット、予約履行のコントラクトになります。
+UtilityTokenContract: 予約履行によって予約者宛に発行されるTRESトークンコントラクトになります。
+
+# 技術スタック
+- サーバー: nginx
+- バックエンド： golang
+- DB: mysql
+- フロントエンド：JavaScript, Nuxt(Vue.js)
+- その他
+  - 予約支払い時に事業者の希望するトークンに自動でSwapされます。
+  - その際、UniswapV3のmulti hopを使用しています。
+
 # 事前準備
 ## Mac
 *1. docker for mac のインストール*  
