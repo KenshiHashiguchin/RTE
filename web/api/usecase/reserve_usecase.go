@@ -4,10 +4,12 @@ import (
 	"errors"
 	"github.com/RTE/web/api/domain/model"
 	"github.com/RTE/web/api/domain/repository"
+	"log"
+	"time"
 )
 
 type IReserve interface {
-	Reserve(merchantAddress, reservedAddress, surname, firstname, tel string, number uint) error
+	Reserve(paymentId, merchantAddress, reservedAddress, surname, firstname, tel string, number uint, reserveTs time.Time) error
 }
 
 type reserve struct {
@@ -19,12 +21,12 @@ func NewReserveUseCase(reserveRepo repository.ReserveRepository, merchantRepo re
 	return &reserve{reserveRepo, merchantRepo}
 }
 
-func (t reserve) Reserve(merchantAddress, reservedAddress, surname, firstname, tel string, number uint) error {
-	paymentId, _ := model.GeneratePaymentId()
+func (t reserve) Reserve(paymentId, merchantAddress, reservedAddress, surname, firstname, tel string, number uint, reserveTs time.Time) error {
 	merchant := t.merchantRepo.GetMerchant(merchantAddress)
 	if merchant == nil {
+		log.Print("merchant don't exist")
 		return errors.New("Don't exist")
 	}
-	reservation := model.NewReservation(paymentId, merchant.GetId(), reservedAddress, surname, firstname, tel, number, *merchant)
+	reservation := model.NewReservation(paymentId, merchant.GetId(), reservedAddress, surname, firstname, tel, number, reserveTs, *merchant)
 	return t.reserveRepo.Save(reservation)
 }
