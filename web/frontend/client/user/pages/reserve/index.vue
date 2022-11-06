@@ -91,6 +91,8 @@ export default {
       }else if(this.cancelContractStep === 2) {
         return 'Processing...'
       }else if(this.cancelContractStep === 3) {
+        return ''
+      }else if(this.cancelContractStep === 4) {
         return 'Cancel Committed'
       }else if(this.cancelContractStep === 9) {
         return 'Cancel Failed, Please Retry After Few Minute'
@@ -123,10 +125,12 @@ export default {
     async execSettleReservationContract(nextStep) {
       console.log('---nextStep---')
       console.log(nextStep)
-      if(nextStep === 'inputSendAmountStep'){
+      if(nextStep === 'inputSendAmountStep') {
         this.settlementContractStep = 2
-      }else if(nextStep === 'complete'){
+      }else if(nextStep === 'commit'){
         this.settlementContractStep = 3
+      }else if(nextStep === 'complete'){
+        this.settlementContractStep = 4
         this.reservations.find(v => v.payment_id === this.settlementReservation.payment_id).status = 'Settled'
       }
       // try {

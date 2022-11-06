@@ -1,12 +1,10 @@
 <template>
   <v-dialog v-model="active"
-            @click:outside="close"
-            @keydown.esc="close"
+            persistent
             class="text-center"
             max-width="600"
   >
     <v-card class="px-4">
-
       <template v-if="step === selectTokenStep">
         <v-card-title class="mb-5 text-h4 justify-center">
           Select Token
@@ -41,17 +39,21 @@
         </v-card-title>
         <v-card-text class=text-center>
           <div
-            class=" text-h2 inline-block"
+            class="text-h4 inline-block mb-3"
+          >Pay Amount</div>
+          <div
+            class=" text-h4 inline-block"
           >
             {{ input.current }}
           </div>
           <p>※input your total amount</p>
           <p>Deposit Amount: {{ depositAmount }}</p>
         </v-card-text>
-        <v-card-actions class="justify-center my-5">
-          <v-btn @click="send" color="primary">send</v-btn>
-        </v-card-actions>
-        <v-card-text class="pa-0">
+        <template v-if="!loading">
+          <v-card-actions class="justify-center my-5">
+            <v-btn @click="enter" color="primary">enter</v-btn>
+          </v-card-actions>
+          <v-card-text class="pa-0">
           <v-container grid-list-xs pa-1>
             <v-layout row wrap pa0>
               <v-flex v-for="button in buttons" :key="button.key" xs4 class="text-center mb-2">
@@ -69,6 +71,39 @@
             </v-layout>
           </v-container>
         </v-card-text>
+        </template>
+        <div v-else class="text-center my-4">
+          <v-card-text>Calculating...</v-card-text>
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
+        </div>
+      </template>
+      <template v-if="step === commitStep">
+        <v-card-title class="mb-5 text-h4">
+          Confirmation
+        </v-card-title>
+        <v-card-text class="text-center">
+          <div
+            class="text-h4 inline-block mb-3"
+          >You send {{paymentTokenName}}</div>
+          <div
+            class="inline-block"
+          ><p>{{paymentAmount}}</p></div>
+        </v-card-text>
+        <template v-if="!loading">
+          <v-card-actions class="justify-center my-5">
+            <v-btn @click="commit" color="primary">OK</v-btn>
+          </v-card-actions>
+        </template>
+        <div v-else class="text-center my-4">
+          <v-card-text>Calculating...</v-card-text>
+          <v-progress-circular
+            indeterminate
+            color="primary"
+          ></v-progress-circular>
+        </div>
       </template>
       <template v-if="step === completeStep">
         <v-card-title class="mb-5 text-h4 justify-center">
@@ -82,6 +117,7 @@
                  color="primary"
                  text
                  class=""
+                 :disabled="loading"
                  @click="back"
           >
             back
@@ -90,6 +126,7 @@
             color="primary"
             text
             class="ml-auto"
+            :disabled="loading"
             @click="close"
           >
             close
@@ -102,7 +139,7 @@
 
 <script>
 import {AlphaRouter} from "@uniswap/smart-order-router";
-import {CurrencyAmount, Percent, Token, TradeType} from "@uniswap/sdk-core";
+import {CurrencyAmount, Percent, Token, TradeType, Pair} from "@uniswap/sdk-core";
 import {ethers} from "ethers";
 import {get} from 'lodash'
 import tokenContactAddresses from "~/constants/tokenContactAddresses";
@@ -120,6 +157,7 @@ export default {
         operator: "",
         prev: "",
       },
+      paymentAmount: 0,
       receiveTokenDecimals: 18,
       paymentTokenName: '',
       paymentTokenDecimal: 18,
@@ -184,11 +222,15 @@ export default {
     inputSendAmountStep() {
       return 2
     },
-    completeStep() {
+    commitStep() {
       return 3
     },
+    completeStep() {
+      return 4
+    },
     receiveTokenAmount() {
-      return this.input.current
+      const amount = this.input.current - this.depositAmount
+      return amount > 0 ? amount : 0
     },
     toName() {
       return get(this.reservation, 'merchant.name', '')
@@ -323,23 +365,25 @@ export default {
           }
         )
         this.paymentAmount = route.quote.toFixed(this.paymentTokenDecimal)
+        if (this.toBalance < this.paymentAmount * (10 ** this.toDecimal)) {
+          console.log('balance err')
+        }
         // swapするpath(settleReservationの_path引数)
-        this.pathAddresses = route.trade.routes[0].path
-
-        console.log("this.allowance")
-        console.log(this.allowance)
+        console.log('route.trade.routes[0].path')
+        console.log(route.trade.routes[0].path)
+        this.pathAddresses = route.trade.routes[0].path.map(v => {
+          return v.address
+        })
         if (this.paymentAmount * (10 ** this.paymentTokenDecimal) > this.allowance) {
           this.isApprove = true
         }
-        this.loading = false
       }catch(e){
         console.log(e)
       }
     },
-    async send() {
+    async enter() {
+      this.loading = true
       try {
-        this.loading = true
-
         await this.setAllowance()
         await this.calcRequiredAmount()
 
@@ -348,16 +392,23 @@ export default {
         const contract = await this.getContract(instance, this.paymentTokenName)
         const contractAddress = trustReserveContractAddress.address
 
-        const approve = await contract.methods.approve(contractAddress, this.paymentAmount * (10 ** this.toDecimal))
+        const approve = await contract.methods.approve(contractAddress, this.paymentAmount * (10 ** this.paymentTokenDecimal))
           .send({from: address})
         console.log(approve)
-
-        await this.settlement()
-
-        this.loading = false
       } catch (error) {
         console.log(error)
       }
+      this.loading = false
+      this.next('commit')
+    },
+    async commit () {
+      this.loading = true
+      try {
+        await this.settlement()
+      }catch(e){
+        console.log(e)
+      }
+      this.loading = false
       this.next('complete')
     },
     async settlement() {
@@ -367,12 +418,13 @@ export default {
         const account = accounts[0]
         const contract = await this.getContract(instance)
         const datetime = new Date()
+        const amountIn = this.paymentAmount * (10 ** this.paymentTokenDecimal)
         const res = await contract.methods.settleReservation(
-          this.receiveTokenAmount,
-          this.receiveTokenAmount,
+          amountIn,
+          this.input.current,
           datetime.getTime(),
+          this.reservation.payment_id,
           this.pathAddresses,
-          this.reservation.payment_id
         ).send({from: account})
         console.log(res)
         this.reservation = res
