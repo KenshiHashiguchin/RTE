@@ -2,11 +2,12 @@
   <v-data-table
     :headers="headers"
     :items="reserves"
+    :disable-sort="true"
     :hide-default-footer="true"
     class="elevation-1"
   >
     <template v-slot:item.actions="{ item }">
-      <v-btn x-small @click="settlement(item)" color="primary">Settlement</v-btn>
+      <v-btn v-if="settlementable(item.status)" x-small @click="settlement(item)" color="primary">Settlement</v-btn>
       <a :href="detailUrl(item)" target="_blank">
         <v-btn x-small :disabled="!item" type="button">Detail</v-btn>
       </a>
@@ -76,6 +77,9 @@ export default {
     },
     settlement(item) {
       this.$emit('settlement', item)
+    },
+    settlementable(status) {
+      return status === 'Reserved'
     },
     cancelable(status) {
       return status === 'Reserved'

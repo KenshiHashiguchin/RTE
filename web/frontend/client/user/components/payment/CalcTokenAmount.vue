@@ -130,6 +130,9 @@ export default {
           }
       )
       this.paymentAmount = route.quote.toFixed(this.toDecimal)
+      // swapするpath(settleReservationの_path引数)
+      console.log(route.trade.routes[0].path)
+
       console.log("this.allowance")
       console.log(this.allowance)
       if (this.paymentAmount * (10 ** this.toDecimal) > this.allowance) {
@@ -159,10 +162,12 @@ export default {
         const contract = await this.getContract(instance)
 
         const paymentId = Math.random().toString(32).substring(2)
+        console.log('---paymentId----')
         console.log(paymentId)
 
         // calc timestamp
         const datetime = new Date(this.reservation.date +' '+this.reservation.time)
+        console.log('---datetime.getTime()---')
         console.log(datetime.getTime())
 
         const reserve = await contract.methods.reserve(
@@ -170,10 +175,12 @@ export default {
             this.merchant.address,
             this.toAddress,
             this.paymentAmount * (10 ** this.toDecimal),
-            datetime.getTime() - this.merchant.cancelable_time,
+            datetime.getTime(),
+            // datetime.getTime() - this.merchant.cancelable_time,
             datetime.getTime() + 100000
         )
             .send({from: address})
+        console.log('---reserve----')
         console.log(reserve)
 
       } catch (error) {

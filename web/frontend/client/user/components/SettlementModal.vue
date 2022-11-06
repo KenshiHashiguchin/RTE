@@ -2,61 +2,117 @@
   <v-dialog v-model="active"
             @click:outside="close"
             @keydown.esc="close"
-            width="350"
             class="text-center"
+            max-width="600"
   >
-    <v-card>
-      <v-card-title class="mb-5 text-h4 justify-center">
-        Send To {{toName}}
-      </v-card-title>
+    <v-card class="px-4">
 
-      <v-card-text class=text-center>
-        <div
-          class=" text-h2 inline-block"
+      <template v-if="step === selectTokenStep">
+        <v-card-title class="mb-5 text-h4 justify-center">
+          Select Token
+        </v-card-title>
+        <v-container
+          fluid
+          class="pa-0"
         >
-          {{ input.current }}
-        </div>
-      </v-card-text>
-      <v-card-actions class="justify-center my-5">
-        <v-btn @click="next" color="primary">next</v-btn>
-      </v-card-actions>
-      <v-card-text class="pa-0">
-        <v-container grid-list-xs pa-1>
-          <v-layout row wrap pa0>
-            <v-flex v-for="button in buttons" :key="button.key" xs4 class="text-center mb-2">
-              <v-btn v-if="button.key"
-                     :class="['ma-0', button.class]"
-                     :color="button.color"
-                     @click="inputKey(button.key)"
-                     fab
-                     large
-              >
-                <v-icon v-if="button.icon" dark>{{ button.icon }}</v-icon>
-                <template v-else>{{ button.label }}</template>
+          <v-row v-if="!loading" align="center">
+            <v-col
+              v-for="token in erc20"
+              :key="token.address"
+              cols="12"
+              sm="12"
+            >
+              <v-btn block @click="calcTokenAmount(token.name)">
+                {{ token.name }}　 {{ balance(token.name) }}
               </v-btn>
-            </v-flex>
-          </v-layout>
+            </v-col>
+          </v-row>
+          <div v-else class="text-center my-4">
+            <v-progress-circular
+              indeterminate
+              color="primary"
+            ></v-progress-circular>
+          </div>
         </v-container>
-      </v-card-text>
+      </template>
+      <template v-if="step === inputSendAmountStep">
+        <v-card-title class="mb-5 text-h4 justify-center">
+          Send To {{ toName }}
+        </v-card-title>
+        <v-card-text class=text-center>
+          <div
+            class=" text-h2 inline-block"
+          >
+            {{ input.current }}
+          </div>
+          <p>※input your total amount</p>
+          <p>Deposit Amount: {{ depositAmount }}</p>
+        </v-card-text>
+        <v-card-actions class="justify-center my-5">
+          <v-btn @click="send" color="primary">send</v-btn>
+        </v-card-actions>
+        <v-card-text class="pa-0">
+          <v-container grid-list-xs pa-1>
+            <v-layout row wrap pa0>
+              <v-flex v-for="button in buttons" :key="button.key" xs4 class="text-center mb-2">
+                <v-btn v-if="button.key"
+                       :class="['ma-0', button.class]"
+                       :color="button.color"
+                       @click="inputKey(button.key)"
+                       fab
+                       large
+                >
+                  <v-icon v-if="button.icon" dark>{{ button.icon }}</v-icon>
+                  <template v-else>{{ button.label }}</template>
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+      </template>
+      <template v-if="step === completeStep">
+        <v-card-title class="mb-5 text-h4 justify-center">
+          Result
+        </v-card-title>
+        <v-card-text>Payment completed!<br/>We look forward to seeing you again!</v-card-text>
+      </template>
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          color="primary"
-          text
-          @click="close"
-        >
-          close
-        </v-btn>
+        <v-flex class="d-flex justify-space-between">
+          <v-btn v-if="step === 2"
+                 color="primary"
+                 text
+                 class=""
+                 @click="back"
+          >
+            back
+          </v-btn>
+          <v-btn
+            color="primary"
+            text
+            class="ml-auto"
+            @click="close"
+          >
+            close
+          </v-btn>
+        </v-flex>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import {AlphaRouter} from "@uniswap/smart-order-router";
+import {CurrencyAmount, Percent, Token, TradeType} from "@uniswap/sdk-core";
+import {ethers} from "ethers";
 import {get} from 'lodash'
+import tokenContactAddresses from "~/constants/tokenContactAddresses";
+import Web3 from "web3";
+import web3Mixin from "~/mixins/web3Mixin";
+import trustReserveContractAddress from "~/constants/trustReserveContractAddress.json";
 
 export default {
   name: "SettlementModal",
+  mixins: [web3Mixin],
   data() {
     return {
       input: {
@@ -64,9 +120,23 @@ export default {
         operator: "",
         prev: "",
       },
+      receiveTokenDecimals: 18,
+      paymentTokenName: '',
+      paymentTokenDecimal: 18,
+      paymentAddress: '',
+      paymentBalance: 0,
+      balances: [],
+
+      allowance: 0,
+      loading: false,
+      pathAddresses: [],
     }
   },
   props: {
+    step: {
+      type: Number,
+      default: 1,
+    },
     active: {
       type: Boolean,
       default: false,
@@ -77,6 +147,46 @@ export default {
     }
   },
   computed: {
+    receiveAddress() {
+      return get(this.reservation, 'merchant.received_address', '')
+    },
+    depositAmount() {
+      return get(this.reservation, 'depositAmount', '0')
+    },
+    erc20Address() {
+      let erc20 = Object.keys(tokenContactAddresses.TOKEN_CONTRACT_ADDRESSES).filter((key) => {
+        return tokenContactAddresses.TOKEN_CONTRACT_ADDRESSES[key].address === this.receiveAddress
+      });
+
+      if (erc20.length > 0) {
+        return tokenContactAddresses.TOKEN_CONTRACT_ADDRESSES[erc20].name
+      }
+
+      return this.receiveAddress
+    },
+    erc20() {
+      return tokenContactAddresses.TOKEN_CONTRACT_ADDRESSES
+    },
+    balance() {
+      return (ercName) => {
+        const item = this.balances.find(item => {
+          return item.name === ercName
+        })
+        if (!item) {
+          return "--"
+        }
+        return Math.round(item.balance / (10 ** item.decimals) * 10000) / 10000
+      }
+    },
+    selectTokenStep() {
+      return 1
+    },
+    inputSendAmountStep() {
+      return 2
+    },
+    completeStep() {
+      return 3
+    },
     toName() {
       return get(this.reservation, 'merchant.name', '')
     },
@@ -135,10 +245,139 @@ export default {
           return;
       }
     },
-    next() {
+    next(nextStep) {
+      this.$emit('next', nextStep)
+    },
+    back() {
+      this.$emit('back')
+    },
+    async calcTokenAmount(tokenName) {
+      const item = this.balances.find(item => {
+        return item.name === tokenName
+      })
+      this.paymentTokenDecimal = Number(item.decimals)
+      this.paymentTokenName = tokenName
+      this.paymentAddress = item.address
+      this.next('inputSendAmountStep')
+    },
+    async setBalances() {
+      this.erc20.forEach(token => {
+        this.setBalanceOf(token)
+      })
+    },
+    async setBalanceOf(token) {
+      try {
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const address = await instance.eth.getCoinbase();
+        const contract = await this.getContract(instance, token.name)
+        const balance = await contract.methods.balanceOf(address).call()
+        const decimals = await contract.methods.decimals().call()
+        console.log(balance)
+        console.log(decimals)
+        this.balances.push({name: token.name, balance: balance, decimals: decimals, address: contract._address})
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async setReceiveTokenDecimals() {
+      const instance = this.createWeb3Instance(Web3.givenProvider)
+      const contract = await this.getContract(instance, this.receiveTokenName)
+      this.receiveTokenDecimals = Number(await contract.methods.decimals().call())
+    },
+    async setAllowance() {
+      try {
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const address = await instance.eth.getCoinbase();
+        const contract = await this.getContract(instance, this.paymentTokenName)
+        const contractAddress = trustReserveContractAddress.address
 
-    }
+        this.allowance = await contract.methods.allowance(address, contractAddress)
+          .call()
+        console.log(this.allowance)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async calcRequiredAmount() {
+      await window.ethereum.request({method: 'eth_requestAccounts'})
+      const instance = this.createWeb3Instance(window.ethereum)
+      const networkId = await instance.eth.net.getId();
+      const from = new Token(networkId, this.receiveAddress, this.receiveTokenDecimals, this.receiveTokenName, this.receiveTokenName)
+      const to = new Token(networkId, this.paymentAddress, this.paymentTokenDecimal, this.paymentTokenName, this.paymentTokenName)
+
+      const requireAmount = CurrencyAmount.fromRawAmount(from, this.receiveTokenAmount)
+      const web3Provider = new ethers.providers.JsonRpcProvider(process.env.infuraUrl)
+      const router = new AlphaRouter({chainId: networkId, provider: web3Provider})
+      const route = await router.route(
+        requireAmount,
+        to,
+        TradeType.EXACT_OUTPUT,
+        {
+          recipient: this.receiveAddress, // FIXME
+          slippageTolerance: new Percent(25, 100),
+          deadline: Math.floor(Date.now() / 1000 + 1800)
+        }
+      )
+      this.paymentAmount = route.quote.toFixed(this.paymentTokenDecimal)
+      // swapするpath(settleReservationの_path引数)
+      this.pathAddresses = route.trade.routes[0].path
+
+      console.log("this.allowance")
+      console.log(this.allowance)
+      if (this.paymentAmount * (10 ** this.paymentTokenDecimal) > this.allowance) {
+        this.isApprove = true
+      }
+      this.loading = false
+    },
+    async send() {
+      try {
+        this.loading = true
+
+        await this.setAllowance()
+        await this.calcRequiredAmount()
+
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const address = await instance.eth.getCoinbase();
+        const contract = await this.getContract(instance, this.paymentTokenName)
+        const contractAddress = trustReserveContractAddress.address
+
+        const approve = await contract.methods.approve(contractAddress, this.paymentAmount * (10 ** this.toDecimal))
+          .send({from: address})
+        console.log(approve)
+
+        await this.settlement()
+
+        this.loading = false
+      } catch (error) {
+        console.log(error)
+      }
+      this.next('complete')
+    },
+    async settlement() {
+      try {
+        const instance = this.createWeb3Instance(Web3.givenProvider)
+        const accounts = await instance.eth.getAccounts()
+        const account = accounts[0]
+        const contract = await this.getContract(instance)
+        const datetime = new Date()
+        const res = await contract.methods.settleReservation(
+          this.input,
+          this.input,
+          datetime.getTime(),
+          this.pathAddresses,
+          this.reservation.payment_id
+        ).send({from: account})
+        console.log(res)
+        this.reservation = res
+      } catch (error) {
+        console.log(error)
+      }
+    },
   },
+  mounted() {
+    this.setBalances()
+    this.setReceiveTokenDecimals()
+  }
 }
 </script>
 
