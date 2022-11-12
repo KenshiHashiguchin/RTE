@@ -229,7 +229,7 @@ export default {
       return 4
     },
     receiveTokenAmount() {
-      const amount = this.input.current - this.depositAmount
+      const amount = this.input.current
       return amount > 0 ? amount : 0
     },
     toName() {
